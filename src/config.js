@@ -1,5 +1,5 @@
 // App-wide constants. Change ADMIN_EMAIL to wherever tool requests should go.
-export const ADMIN_EMAIL = 'reyghim1093@gmail.com';
+export const ADMIN_EMAIL = 'roamkitsupport@gmail.com';
 export const APP_NAME = 'Roamkit';
 export const APP_VERSION = '1.0.0';
 export const PRIVACY_URL = 'https://sishirp17.github.io/roamkit-privacy/';

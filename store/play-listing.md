@@ -67,7 +67,7 @@ Pack light. Roam far. Stay offline.
 - Tags: travel, currency converter, offline, unit converter, world clock
 
 ## Contact details
-- Email: reyghim1093@gmail.com
+- Email: roamkitsupport@gmail.com
 - Website (optional): your hosted privacy page URL
 - Privacy Policy URL: (host store/privacy-policy.html, e.g. GitHub Pages)
 

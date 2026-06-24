@@ -51,4 +51,4 @@ new "Last updated" date.
 
 ## Contact
 
-Questions about this policy? Email: **reyghim1093@gmail.com**
+Questions about this policy? Email: **roamkitsupport@gmail.com**
