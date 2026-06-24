@@ -17,6 +17,11 @@ const FEATURES = [
     desc: 'Tap to hear phrasebook phrases pronounced out loud in the local language — works offline.',
   },
   {
+    icon: '🧭',
+    title: 'Compass',
+    desc: 'A full offline compass for hiking and camping — find your bearing anywhere.',
+  },
+  {
     icon: '✨',
     title: 'Every future Pro tool',
     desc: 'New premium tools are added over time — you get them all, no extra cost.',

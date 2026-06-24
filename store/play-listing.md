@@ -94,6 +94,8 @@ Roamkit has no objectionable content. Expected result: **Everyone / PEGI 3.**
 - Camera permission: used ONLY to turn on the device flashlight (LED) in the
   Flashlight tool. The app never opens a camera preview, and never takes,
   stores, or transmits photos or video.
+- Location permission: used ONLY on-device to calculate local sunrise/sunset
+  times in the Sun Times tool. Location is never stored, logged, or transmitted.
 
 ## Required graphic assets (sizes)
 - App icon: 512 x 512 PNG (32-bit). Generate from assets/icon.png.

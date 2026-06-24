@@ -25,6 +25,9 @@ export default function RootLayout() {
         <Stack.Screen name="timezones" options={{ title: 'World Clock' }} />
         <Stack.Screen name="phrasebook" options={{ title: 'Phrasebook' }} />
         <Stack.Screen name="flashlight" options={{ title: 'Flashlight & SOS' }} />
+        <Stack.Screen name="compass" options={{ title: 'Compass' }} />
+        <Stack.Screen name="sun" options={{ title: 'Sun Times' }} />
+        <Stack.Screen name="survival" options={{ title: 'Survival Guide' }} />
         <Stack.Screen name="budget" options={{ title: 'Trip Budget' }} />
         <Stack.Screen name="settings" options={{ title: 'Settings' }} />
         <Stack.Screen name="pro" options={{ title: 'Roamkit Pro', presentation: 'modal' }} />

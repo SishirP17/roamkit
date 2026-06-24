@@ -41,6 +41,12 @@
           "cameraPermission": "Roamkit uses the camera only to turn on your phone's flashlight (LED). It never takes or stores photos.",
           "recordAudioAndroid": false
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Roamkit uses your location only to calculate local sunrise and sunset times. It is never stored or shared."
+        }
       ]
     ],
     "extra": {
