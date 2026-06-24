@@ -1,7 +1,11 @@
+import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { APP_NAME, APP_VERSION, PRIVACY_URL, TIP_URL } from '../src/config';
+
+// Read the real version from app config so it never drifts out of sync.
+const VERSION = Constants.expoConfig?.version || APP_VERSION;
 import { usePro } from '../src/lib/pro';
 import { requestTool } from '../src/lib/requestTool';
 import { colors, font, radius, spacing } from '../src/theme';
@@ -17,7 +21,7 @@ export default function Settings() {
       contentContainerStyle={{ padding: spacing.lg, paddingBottom: insets.bottom + spacing.xl }}
     >
       <View style={styles.hero}>
-        <Text style={styles.logo}>🧭</Text>
+        <Image source={require('../assets/icon.png')} style={styles.logo} />
         <Text style={styles.appName}>{APP_NAME}</Text>
         <Text style={styles.tagline}>Travel tools that work offline.</Text>
       </View>
@@ -50,7 +54,7 @@ export default function Settings() {
         sub="How your data is handled (spoiler: it stays on your device)"
         onPress={() => Linking.openURL(PRIVACY_URL).catch(() => {})}
       />
-      <Row icon="📦" title="Version" sub={APP_VERSION} />
+      <Row icon="📦" title="Version" sub={VERSION} />
 
       <Text style={styles.footer}>
         Roamkit works fully offline. The only time it uses the internet is to
@@ -81,7 +85,7 @@ function Row({ icon, title, sub, onPress }) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   hero: { alignItems: 'center', paddingVertical: spacing.xl },
-  logo: { fontSize: 48 },
+  logo: { width: 84, height: 84, borderRadius: 20, marginBottom: spacing.sm },
   appName: { color: colors.text, fontSize: font.h1, fontWeight: '800', marginTop: spacing.sm },
   tagline: { color: colors.textDim, fontSize: font.body, marginTop: spacing.xs },
   section: {

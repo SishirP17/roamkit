@@ -91,6 +91,9 @@ Roamkit has no objectionable content. Expected result: **Everyone / PEGI 3.**
   collected; uninstalling removes local preferences).
 - Note for reviewers: the app stores preferences locally on-device only and makes
   one HTTPS request to fetch public currency exchange rates (no personal data).
+- Camera permission: used ONLY to turn on the device flashlight (LED) in the
+  Flashlight tool. The app never opens a camera preview, and never takes,
+  stores, or transmits photos or video.
 
 ## Required graphic assets (sizes)
 - App icon: 512 x 512 PNG (32-bit). Generate from assets/icon.png.

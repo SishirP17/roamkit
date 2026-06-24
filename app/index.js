@@ -92,13 +92,19 @@ export default function Home() {
                     <Text style={styles.soonText}>SOON</Text>
                   </View>
                 )}
-                {/* Show PRO only while locked; once owned it's just a normal tool. */}
+                {/* Fully-locked Pro tool: shows lock, routes to paywall. */}
                 {locked && (
                   <View style={styles.proBadge}>
                     <Text style={styles.proText}>🔒 PRO</Text>
                   </View>
                 )}
-                {isActive && !locked && (
+                {/* Free tool with a Pro extra inside (e.g. phrasebook audio). */}
+                {!locked && tool.proHint && !isPro && (
+                  <View style={[styles.proBadge, styles.proHintBadge]}>
+                    <Text style={styles.proText}>PRO</Text>
+                  </View>
+                )}
+                {isActive && !locked && !(tool.proHint && !isPro) && (
                   <View style={[styles.dot, { backgroundColor: tool.color }]} />
                 )}
               </Pressable>
@@ -242,6 +248,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   proBadgeOwned: { backgroundColor: colors.success },
+  proHintBadge: { backgroundColor: colors.accent },
   proText: {
     color: '#0B1220',
     fontSize: 9,

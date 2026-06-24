@@ -59,6 +59,7 @@ export const TOOLS = [
     color: tileColors.pink,
     route: '/phrasebook',
     status: 'active',
+    proHint: true, // free to read; tap-to-hear audio is Pro
   },
   {
     id: 'flashlight',

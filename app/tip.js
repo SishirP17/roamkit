@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -8,9 +9,12 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import CurrencyPicker from '../src/components/CurrencyPicker';
+import { CURRENCY_MAP } from '../src/data/currencies';
 import { colors, font, radius, spacing } from '../src/theme';
 
 const TIP_PRESETS = [10, 15, 18, 20, 25];
+const CUR_KEY = 'tip.currency.v1';
 
 export default function TipSplit() {
   const insets = useSafeAreaInsets();
@@ -19,6 +23,18 @@ export default function TipSplit() {
   const [customTip, setCustomTip] = useState('');
   const [people, setPeople] = useState(2);
   const [roundUp, setRoundUp] = useState(false);
+  const [currency, setCurrency] = useState('USD');
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  // Remember the chosen currency so it adapts to wherever you are.
+  useEffect(() => {
+    AsyncStorage.getItem(CUR_KEY).then((v) => v && setCurrency(v)).catch(() => {});
+  }, []);
+  const pickCurrency = (code) => {
+    setCurrency(code);
+    AsyncStorage.setItem(CUR_KEY, code).catch(() => {});
+  };
+  const sym = CURRENCY_MAP[currency]?.symbol || '';
 
   const billNum = parseFloat(bill.replace(',', '.')) || 0;
   const effectiveTip =
@@ -46,7 +62,11 @@ export default function TipSplit() {
       {/* Bill */}
       <Text style={styles.label}>Bill amount</Text>
       <View style={styles.card}>
-        <Text style={styles.prefix}>$</Text>
+        <Pressable onPress={() => setPickerOpen(true)} style={styles.curChip}>
+          <Text style={styles.curFlag}>{CURRENCY_MAP[currency]?.flag}</Text>
+          <Text style={styles.curCode}>{currency}</Text>
+          <Text style={styles.curCaret}>▾</Text>
+        </Pressable>
         <TextInput
           style={styles.input}
           value={bill}
@@ -122,18 +142,25 @@ export default function TipSplit() {
       <View style={styles.resultCard}>
         <View style={styles.resultRow}>
           <Text style={styles.resultLabel}>Tip</Text>
-          <Text style={styles.resultValue}>${fmt(tipAmount)}</Text>
+          <Text style={styles.resultValue}>{sym}{fmt(tipAmount)}</Text>
         </View>
         <View style={styles.resultRow}>
           <Text style={styles.resultLabel}>Total</Text>
-          <Text style={styles.resultValue}>${fmt(total)}</Text>
+          <Text style={styles.resultValue}>{sym}{fmt(total)}</Text>
         </View>
         <View style={styles.resultDivider} />
         <View style={styles.resultRow}>
           <Text style={styles.perLabel}>Per person</Text>
-          <Text style={styles.perValue}>${fmt(perPerson)}</Text>
+          <Text style={styles.perValue}>{sym}{fmt(perPerson)}</Text>
         </View>
       </View>
+
+      <CurrencyPicker
+        visible={pickerOpen}
+        selected={currency}
+        onClose={() => setPickerOpen(false)}
+        onSelect={pickCurrency}
+      />
     </ScrollView>
   );
 }
@@ -151,7 +178,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
-  prefix: { color: colors.textDim, fontSize: 30, fontWeight: '700', marginRight: spacing.sm },
+  curChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radius.pill,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    marginRight: spacing.md,
+  },
+  curFlag: { fontSize: 18 },
+  curCode: { color: colors.text, fontWeight: '800', fontSize: font.body },
+  curCaret: { color: colors.textDim, fontSize: 11 },
   input: { flex: 1, color: colors.text, fontSize: 32, fontWeight: '700', padding: 0 },
   tipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   tipChip: {

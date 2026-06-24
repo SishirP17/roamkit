@@ -34,6 +34,13 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 200
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Roamkit uses the camera only to turn on your phone's flashlight (LED). It never takes or stores photos.",
+          "recordAudioAndroid": false
+        }
       ]
     ],
     "extra": {

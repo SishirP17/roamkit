@@ -1,17 +1,19 @@
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Brightness from 'expo-brightness';
 import { useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, font, radius, spacing } from '../src/theme';
 
-// Builds an SOS morse timeline (... --- ...) as [{on, ms}, ...].
-// One time unit = 220ms.
+const isWeb = Platform.OS === 'web';
+
+// SOS morse timeline (... --- ...). One unit = 220ms.
 function buildSos() {
   const U = 220;
   const seq = [];
   const dot = () => seq.push({ on: true, ms: U }, { on: false, ms: U });
   const dash = () => seq.push({ on: true, ms: U * 3 }, { on: false, ms: U });
-  const letterGap = () => seq.push({ on: false, ms: U * 2 }); // +1U already added = 3U
+  const letterGap = () => seq.push({ on: false, ms: U * 2 });
   const wordGap = () => seq.push({ on: false, ms: U * 4 });
   dot(); dot(); dot(); letterGap();
   dash(); dash(); dash(); letterGap();
@@ -24,14 +26,18 @@ export default function Flashlight() {
   const insets = useSafeAreaInsets();
   const [mode, setMode] = useState('off'); // off | on | sos | strobe
   const [flashOn, setFlashOn] = useState(false);
+  const [source, setSource] = useState(isWeb ? 'screen' : 'torch'); // torch | screen
+  const [permission, requestPermission] = useCameraPermissions();
   const prevBrightness = useRef(null);
   const timer = useRef(null);
 
-  const lit = mode === 'on' || ((mode === 'sos' || mode === 'strobe') && flashOn);
+  const lightActive = mode === 'on' || ((mode === 'sos' || mode === 'strobe') && flashOn);
+  const usingTorch = source === 'torch' && !isWeb && !!permission?.granted;
+  const screenLit = lightActive && !usingTorch; // white screen only when no LED torch
 
-  // Maximize device brightness while the light is active (mobile only).
+  // Boost screen brightness only when we're using the SCREEN as the light.
   useEffect(() => {
-    if (Platform.OS === 'web') return;
+    if (isWeb || source !== 'screen') return;
     (async () => {
       try {
         if (mode !== 'off') {
@@ -45,13 +51,13 @@ export default function Flashlight() {
         }
       } catch (e) {}
     })();
-  }, [mode]);
+  }, [mode, source]);
 
   // Restore brightness on unmount.
   useEffect(() => {
     return () => {
       if (timer.current) clearTimeout(timer.current);
-      if (Platform.OS !== 'web' && prevBrightness.current != null) {
+      if (!isWeb && prevBrightness.current != null) {
         Brightness.setBrightnessAsync(prevBrightness.current).catch(() => {});
       }
     };
@@ -72,7 +78,7 @@ export default function Flashlight() {
     } else if (mode === 'strobe') {
       const step = () => {
         setFlashOn((f) => !f);
-        timer.current = setTimeout(step, 90);
+        timer.current = setTimeout(step, 120);
       };
       step();
     } else {
@@ -81,11 +87,41 @@ export default function Flashlight() {
     return () => timer.current && clearTimeout(timer.current);
   }, [mode]);
 
-  const set = (m) => setMode((cur) => (cur === m ? 'off' : m));
+  // Make sure we have torch (camera) permission; if denied, fall back to screen.
+  const ensureTorch = async () => {
+    if (isWeb) return false;
+    if (permission?.granted) return true;
+    const res = await requestPermission();
+    if (!res?.granted) {
+      setSource('screen');
+      return false;
+    }
+    return true;
+  };
+
+  const setModeSafe = async (m) => {
+    const next = mode === m ? 'off' : m;
+    if (next !== 'off' && source === 'torch') await ensureTorch();
+    setMode(next);
+  };
+
+  const toggleSource = async () => {
+    if (source === 'screen') {
+      const ok = await ensureTorch();
+      if (ok) setSource('torch');
+    } else {
+      setSource('screen');
+    }
+  };
 
   return (
-    <View style={[styles.screen, lit && styles.screenLit]}>
-      {/* Tap anywhere on the lit area to turn off */}
+    <View style={[styles.screen, screenLit && styles.screenLit]}>
+      {/* Hidden camera view — required for LED torch control. */}
+      {!isWeb && source === 'torch' && permission?.granted && (
+        <CameraView style={styles.hiddenCam} facing="back" enableTorch={lightActive} />
+      )}
+
+      {/* Tap anywhere to turn off while active */}
       {mode !== 'off' && (
         <Pressable style={StyleSheet.absoluteFill} onPress={() => setMode('off')} />
       )}
@@ -97,19 +133,30 @@ export default function Flashlight() {
         ]}
         pointerEvents="box-none"
       >
-        <Text style={[styles.title, lit && styles.titleLit]}>
+        <Text style={[styles.title, screenLit && styles.titleLit]}>
           {mode === 'off' ? 'Tap a mode' : 'Tap screen to turn off'}
         </Text>
 
         <View style={styles.buttons} pointerEvents="auto">
-          <ModeButton label="Light" icon="💡" active={mode === 'on'} onPress={() => set('on')} lit={lit} />
-          <ModeButton label="SOS" icon="🆘" active={mode === 'sos'} onPress={() => set('sos')} lit={lit} />
-          <ModeButton label="Strobe" icon="⚡" active={mode === 'strobe'} onPress={() => set('strobe')} lit={lit} />
+          <ModeButton label="Light" icon="💡" active={mode === 'on'} onPress={() => setModeSafe('on')} lit={screenLit} />
+          <ModeButton label="SOS" icon="🆘" active={mode === 'sos'} onPress={() => setModeSafe('sos')} lit={screenLit} />
+          <ModeButton label="Strobe" icon="⚡" active={mode === 'strobe'} onPress={() => setModeSafe('strobe')} lit={screenLit} />
         </View>
 
-        {Platform.OS === 'web' && (
-          <Text style={[styles.note, lit && styles.noteLit]}>
-            On a phone this also maxes out screen brightness.
+        {/* Light source toggle (LED torch vs bright screen) */}
+        {!isWeb && (
+          <Pressable onPress={toggleSource} style={styles.sourceToggle} pointerEvents="auto">
+            <Text style={[styles.sourceText, screenLit && styles.sourceTextLit]}>
+              {source === 'torch' ? '🔦 Using flashlight' : '📱 Using screen'}
+              <Text style={styles.sourceSwap}>
+                {source === 'torch' ? '  ·  no light? use screen' : '  ·  switch to flashlight'}
+              </Text>
+            </Text>
+          </Pressable>
+        )}
+        {isWeb && (
+          <Text style={[styles.note, screenLit && styles.noteLit]}>
+            On a phone this uses your real flashlight.
           </Text>
         )}
       </View>
@@ -134,6 +181,7 @@ function ModeButton({ label, icon, active, onPress, lit }) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg, justifyContent: 'flex-end' },
   screenLit: { backgroundColor: '#FFFFFF' },
+  hiddenCam: { position: 'absolute', width: 1, height: 1, top: 0, left: 0, opacity: 0 },
   controls: { paddingHorizontal: spacing.lg, alignItems: 'center', gap: spacing.lg },
   title: { color: colors.textDim, fontSize: font.body, fontWeight: '600' },
   titleLit: { color: '#222' },
@@ -155,6 +203,10 @@ const styles = StyleSheet.create({
   btnLabel: { color: colors.textDim, fontWeight: '700', fontSize: font.small },
   btnLabelActive: { color: colors.white },
   btnLabelOnLit: { color: '#333' },
+  sourceToggle: { paddingVertical: spacing.sm },
+  sourceText: { color: colors.textDim, fontSize: font.small, fontWeight: '700' },
+  sourceTextLit: { color: '#444' },
+  sourceSwap: { color: colors.textFaint, fontWeight: '500' },
   note: { color: colors.textFaint, fontSize: font.small, textAlign: 'center' },
   noteLit: { color: '#555' },
 });
