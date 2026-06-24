@@ -1,20 +1,21 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  BILLING_ENABLED,
+  PRO_ENTITLEMENT_ID,
+  REVENUECAT_ANDROID_KEY,
+} from '../config';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Pro entitlement. Right now this is a LOCAL flag so the paywall and gating are
-// fully testable before billing is live.
+// Pro entitlement. The whole app only depends on `isPro` from usePro(), so the
+// rest of the codebase never changes whether billing is real or simulated.
 //
-// TO GO LIVE WITH REAL BILLING (after the app is in a Play testing track):
-//   1. npx expo install react-native-purchases   (RevenueCat)
-//   2. Configure a one-time product in Play Console + RevenueCat.
-//   3. In unlockPro(): call Purchases.purchasePackage(...) and set isPro from
-//      the returned customerInfo.entitlements.active['pro'].
-//   4. In restorePro(): call Purchases.restorePurchases().
-//   5. On mount: read entitlements from Purchases.getCustomerInfo() instead of
-//      (or in addition to) AsyncStorage.
-// The rest of the app only depends on `isPro` from usePro(), so nothing else
-// needs to change.
+//   • BILLING_ENABLED = false  → Pro unlocks LOCALLY (for testing in Expo Go).
+//   • BILLING_ENABLED = true   → real RevenueCat purchase / restore / entitlement.
+//
+// react-native-purchases is a NATIVE module (not in Expo Go), so it is loaded
+// LAZILY and only when billing is on. With billing off, nothing here touches it,
+// which keeps Expo Go and non-billing builds working. See store/BILLING.md.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const STORAGE_KEY = 'pro.entitlement.v1';
@@ -22,10 +23,32 @@ const STORAGE_KEY = 'pro.entitlement.v1';
 // The Pro price shown on the paywall. Keep in sync with the Play Console product.
 export const PRO_PRICE = '$4.99';
 
+// Whether the app is wired for real payments right now.
+export const isBillingLive = BILLING_ENABLED && !!REVENUECAT_ANDROID_KEY;
+
+// Lazy RevenueCat handle. Configured once, only when billing is live.
+let Purchases = null;
+let configured = false;
+async function getPurchases() {
+  if (!isBillingLive) return null;
+  if (!Purchases) {
+    Purchases = require('react-native-purchases').default;
+  }
+  if (!configured) {
+    await Purchases.configure({ apiKey: REVENUECAT_ANDROID_KEY });
+    configured = true;
+  }
+  return Purchases;
+}
+
+function hasProEntitlement(customerInfo) {
+  return !!customerInfo?.entitlements?.active?.[PRO_ENTITLEMENT_ID];
+}
+
 const ProContext = createContext({
   isPro: false,
   ready: false,
-  unlockPro: async () => {},
+  unlockPro: async () => false,
   restorePro: async () => false,
   resetPro: async () => {},
 });
@@ -34,12 +57,35 @@ export function ProProvider({ children }) {
   const [isPro, setIsPro] = useState(false);
   const [ready, setReady] = useState(false);
 
+  // Mirror the entitlement to AsyncStorage so it's available instantly and
+  // offline on the next launch (and as the only source of truth in local mode).
+  const cache = async (value) => {
+    try {
+      if (value) await AsyncStorage.setItem(STORAGE_KEY, 'true');
+      else await AsyncStorage.removeItem(STORAGE_KEY);
+    } catch (e) {}
+  };
+
   useEffect(() => {
     (async () => {
+      // Fast path: trust the cached flag first so the UI doesn't flicker.
       try {
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
         if (raw === 'true') setIsPro(true);
       } catch (e) {}
+
+      // Authoritative path: ask RevenueCat when billing is live.
+      if (isBillingLive) {
+        try {
+          const P = await getPurchases();
+          const info = await P.getCustomerInfo();
+          const ok = hasProEntitlement(info);
+          setIsPro(ok);
+          await cache(ok);
+        } catch (e) {
+          // Offline or RC unreachable — keep the cached value.
+        }
+      }
       setReady(true);
     })();
   }, []);
@@ -48,16 +94,41 @@ export function ProProvider({ children }) {
     () => ({
       isPro,
       ready,
-      // Local unlock for now. Replace body with a RevenueCat purchase call.
+      // Buy Pro. Returns true if the entitlement is now active.
       unlockPro: async () => {
+        if (isBillingLive) {
+          const P = await getPurchases();
+          const offerings = await P.getOfferings();
+          const pkg =
+            offerings.current?.availablePackages?.[0] ||
+            Object.values(offerings.all || {})[0]?.availablePackages?.[0];
+          if (!pkg) throw new Error('No Pro package is available to purchase.');
+          const { customerInfo } = await P.purchasePackage(pkg);
+          const ok = hasProEntitlement(customerInfo);
+          setIsPro(ok);
+          await cache(ok);
+          return ok;
+        }
+        // Local unlock (testing).
         setIsPro(true);
-        try {
-          await AsyncStorage.setItem(STORAGE_KEY, 'true');
-        } catch (e) {}
+        await cache(true);
         return true;
       },
-      // Local restore for now. Replace with Purchases.restorePurchases().
+      // Restore a previous purchase on this store account.
       restorePro: async () => {
+        if (isBillingLive) {
+          try {
+            const P = await getPurchases();
+            const info = await P.restorePurchases();
+            const ok = hasProEntitlement(info);
+            setIsPro(ok);
+            await cache(ok);
+            return ok;
+          } catch (e) {
+            return false;
+          }
+        }
+        // Local restore (testing): whatever we cached.
         try {
           const raw = await AsyncStorage.getItem(STORAGE_KEY);
           const has = raw === 'true';
@@ -67,12 +138,11 @@ export function ProProvider({ children }) {
           return false;
         }
       },
-      // Dev helper to re-lock (useful while testing the paywall).
+      // Dev helper to re-lock locally (useful while testing the paywall). Does
+      // not revoke a real store entitlement — only clears the local cache.
       resetPro: async () => {
         setIsPro(false);
-        try {
-          await AsyncStorage.removeItem(STORAGE_KEY);
-        } catch (e) {}
+        await cache(false);
       },
     }),
     [isPro, ready]

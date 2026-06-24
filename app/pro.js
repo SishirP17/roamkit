@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PRO_PRICE, usePro } from '../src/lib/pro';
+import { isBillingLive, PRO_PRICE, usePro } from '../src/lib/pro';
 import { colors, font, radius, spacing } from '../src/theme';
 
 const FEATURES = [
@@ -38,21 +38,35 @@ export default function Paywall() {
   const router = useRouter();
   const { isPro, unlockPro, restorePro } = usePro();
   const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState(null);
+  const [msg, setMsg] = useState(null); // { text, ok }
 
   const onUnlock = async () => {
     setBusy(true);
-    await unlockPro();
-    setBusy(false);
-    // Bounce back so the user lands on the now-unlocked toolkit.
-    router.back();
+    setMsg(null);
+    try {
+      const ok = await unlockPro();
+      if (ok) {
+        // Bounce back so the user lands on the now-unlocked toolkit.
+        router.back();
+        return;
+      }
+      setMsg({ text: 'Purchase not completed.', ok: false });
+    } catch (e) {
+      setMsg({ text: e?.message || 'Something went wrong. Please try again.', ok: false });
+    } finally {
+      setBusy(false);
+    }
   };
 
   const onRestore = async () => {
     setBusy(true);
     const ok = await restorePro();
     setBusy(false);
-    setMsg(ok ? 'Purchase restored ✓' : 'No previous purchase found.');
+    setMsg(
+      ok
+        ? { text: 'Purchase restored ✓', ok: true }
+        : { text: 'No previous purchase found.', ok: false }
+    );
   };
 
   return (
@@ -96,10 +110,15 @@ export default function Paywall() {
           <Pressable onPress={onRestore} disabled={busy} style={styles.restore}>
             <Text style={styles.restoreText}>Restore purchase</Text>
           </Pressable>
-          {msg && <Text style={styles.msg}>{msg}</Text>}
+          {msg && (
+            <Text style={[styles.msg, !msg.ok && { color: colors.danger }]}>
+              {msg.text}
+            </Text>
+          )}
           <Text style={styles.fine}>
-            Billing goes live once the app is on the Play Store. For now this
-            unlocks Pro on your device so you can try everything.
+            {isBillingLive
+              ? 'One-time purchase through Google Play. Restores free on any device signed in to the same account.'
+              : 'Billing goes live once the app is on the Play Store. For now this unlocks Pro on your device so you can try everything.'}
           </Text>
         </>
       )}

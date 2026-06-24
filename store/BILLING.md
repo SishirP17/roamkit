@@ -28,13 +28,19 @@ payments** once Roamkit is on Google Play.
 - Copy the **Android API key** (starts with `goog_`).
 
 ## Step 3 — Flip the switch in the app
-In `src/config.js`:
+The `react-native-purchases` SDK is **already wired** into `src/lib/pro.js`
+(purchase / restore / entitlement, loaded lazily so it never affects Expo Go
+while billing is off). To go live you only edit `src/config.js`:
 ```js
 export const BILLING_ENABLED = true;
 export const REVENUECAT_ANDROID_KEY = 'goog_xxxxxxxxxxxxxxxx';
 ```
-(Claude will wire the `react-native-purchases` SDK into `src/lib/pro.js` at this
-point — install + purchase/restore/entitlement calls. ~30 min.)
+That's it — `usePro()` then makes a real Google Play purchase. No other code
+changes. The paywall already shows real-billing copy and handles cancel/errors.
+
+> Reminder: `react-native-purchases` is native, so it only runs in an **EAS
+> build** (e.g. the `preview` APK), not in Expo Go. With the flag off, Expo Go
+> is unaffected.
 
 ## Step 4 — Build + test a real purchase
 - `eas build -p android --profile preview`
