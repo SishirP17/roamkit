@@ -33,6 +33,14 @@ export default function Settings() {
         onPress={() => router.push('/pro')}
       />
 
+      <Text style={styles.section}>Currency</Text>
+      <Row
+        icon="🪙"
+        title="Add a currency"
+        sub="Add any currency we don't list yet — like the Nepalese Rupee"
+        onPress={() => router.push('/add-currency')}
+      />
+
       <Text style={styles.section}>Support</Text>
       <Row
         icon="☕"

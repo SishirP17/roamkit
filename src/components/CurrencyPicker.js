@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CURRENCIES } from '../data/currencies';
+import { useCurrencies } from '../lib/currencies';
 import { colors, font, radius, spacing } from '../theme';
 
 // Reusable bottom-sheet currency picker used across the money tools.
 export default function CurrencyPicker({ visible, onClose, onSelect, selected, disabled = [] }) {
   const insets = useSafeAreaInsets();
+  const { currencies } = useCurrencies();
   const [search, setSearch] = useState('');
 
-  const filtered = CURRENCIES.filter((c) => {
+  const filtered = currencies.filter((c) => {
     const q = search.trim().toLowerCase();
     if (!q) return true;
     return c.code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q);

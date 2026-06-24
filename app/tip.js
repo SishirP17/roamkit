@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CurrencyPicker from '../src/components/CurrencyPicker';
-import { CURRENCY_MAP } from '../src/data/currencies';
+import { useCurrencies } from '../src/lib/currencies';
 import { colors, font, radius, spacing } from '../src/theme';
 
 const TIP_PRESETS = [10, 15, 18, 20, 25];
@@ -18,6 +18,7 @@ const CUR_KEY = 'tip.currency.v1';
 
 export default function TipSplit() {
   const insets = useSafeAreaInsets();
+  const { currencyMap } = useCurrencies();
   const [bill, setBill] = useState('');
   const [tipPct, setTipPct] = useState(15);
   const [customTip, setCustomTip] = useState('');
@@ -34,7 +35,7 @@ export default function TipSplit() {
     setCurrency(code);
     AsyncStorage.setItem(CUR_KEY, code).catch(() => {});
   };
-  const sym = CURRENCY_MAP[currency]?.symbol || '';
+  const sym = currencyMap[currency]?.symbol || '';
 
   const billNum = parseFloat(bill.replace(',', '.')) || 0;
   const effectiveTip =
@@ -63,7 +64,7 @@ export default function TipSplit() {
       <Text style={styles.label}>Bill amount</Text>
       <View style={styles.card}>
         <Pressable onPress={() => setPickerOpen(true)} style={styles.curChip}>
-          <Text style={styles.curFlag}>{CURRENCY_MAP[currency]?.flag}</Text>
+          <Text style={styles.curFlag}>{currencyMap[currency]?.flag}</Text>
           <Text style={styles.curCode}>{currency}</Text>
           <Text style={styles.curCaret}>▾</Text>
         </Pressable>

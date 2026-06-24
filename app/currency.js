@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CURRENCIES, CURRENCY_MAP } from '../src/data/currencies';
+import { useCurrencies } from '../src/lib/currencies';
 import { convert, loadRates, refreshRates } from '../src/lib/rateStore';
 import { colors, font, radius, spacing } from '../src/theme';
 
@@ -28,7 +28,10 @@ const DEFAULT_TARGETS = ['EUR', 'GBP', 'THB', 'KRW'];
 
 export default function CurrencyConverter() {
   const insets = useSafeAreaInsets();
-  const [table, setTable] = useState(null);
+  const { currencies, currencyMap, applyRates } = useCurrencies();
+  const [rawTable, setRawTable] = useState(null);
+  // Overlay any user-added currencies' manual rates the feed doesn't cover.
+  const table = useMemo(() => applyRates(rawTable), [rawTable, applyRates]);
   const [mode, setMode] = useState('convert'); // 'convert' | 'compare'
   const [amount, setAmount] = useState('100');
   const [from, setFrom] = useState('USD');
@@ -43,11 +46,11 @@ export default function CurrencyConverter() {
     let alive = true;
     (async () => {
       const initial = await loadRates();
-      if (alive) setTable(initial);
+      if (alive) setRawTable(initial);
       setRefreshing(true);
       const fresh = await refreshRates();
       if (alive) {
-        if (fresh) setTable(fresh);
+        if (fresh) setRawTable(fresh);
         setRefreshing(false);
       }
     })();
@@ -109,7 +112,7 @@ export default function CurrencyConverter() {
   const onManualRefresh = async () => {
     setRefreshing(true);
     const fresh = await refreshRates();
-    if (fresh) setTable(fresh);
+    if (fresh) setRawTable(fresh);
     setRefreshing(false);
   };
 
@@ -127,7 +130,7 @@ export default function CurrencyConverter() {
     setSearch('');
   };
 
-  const filtered = CURRENCIES.filter((c) => {
+  const filtered = currencies.filter((c) => {
     const q = search.trim().toLowerCase();
     if (!q) return true;
     return c.code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q);
@@ -158,7 +161,7 @@ export default function CurrencyConverter() {
       {mode === 'convert' ? (
         <View style={styles.body}>
           <View style={styles.card}>
-            <CurrencyRow label="Amount" currency={CURRENCY_MAP[from]} onPressCurrency={() => setPickerFor('from')}>
+            <CurrencyRow label="Amount" currency={currencyMap[from]} onPressCurrency={() => setPickerFor('from')}>
               <TextInput
                 style={styles.input}
                 value={amount}
@@ -180,7 +183,7 @@ export default function CurrencyConverter() {
           </View>
 
           <View style={styles.card}>
-            <CurrencyRow label="Converted to" currency={CURRENCY_MAP[to]} onPressCurrency={() => setPickerFor('to')}>
+            <CurrencyRow label="Converted to" currency={currencyMap[to]} onPressCurrency={() => setPickerFor('to')}>
               <Text style={styles.result} numberOfLines={1} adjustsFontSizeToFit>
                 {fmt(result)}
               </Text>
@@ -197,7 +200,7 @@ export default function CurrencyConverter() {
         <ScrollView contentContainerStyle={styles.body}>
           {/* Base amount */}
           <View style={styles.card}>
-            <CurrencyRow label="Amount" currency={CURRENCY_MAP[from]} onPressCurrency={() => setPickerFor('from')}>
+            <CurrencyRow label="Amount" currency={currencyMap[from]} onPressCurrency={() => setPickerFor('from')}>
               <TextInput
                 style={styles.input}
                 value={amount}
@@ -213,7 +216,7 @@ export default function CurrencyConverter() {
           <Text style={styles.compareLabel}>Same amount in</Text>
           {compareRows.map((r) => (
             <View key={r.code} style={styles.compareRow}>
-              <Text style={styles.compareFlag}>{CURRENCY_MAP[r.code]?.flag}</Text>
+              <Text style={styles.compareFlag}>{currencyMap[r.code]?.flag}</Text>
               <Text style={styles.compareCode}>{r.code}</Text>
               <Text style={styles.compareValue}>{fmt(r.value)}</Text>
               <Pressable onPress={() => saveTargets(targets.filter((t) => t !== r.code))} hitSlop={10} style={styles.compareDel}>

@@ -12,7 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CurrencyPicker from '../src/components/CurrencyPicker';
 import LockedNotice from '../src/components/LockedNotice';
-import { CURRENCY_MAP } from '../src/data/currencies';
+import { useCurrencies } from '../src/lib/currencies';
 import { usePro } from '../src/lib/pro';
 import { convert, loadRates, refreshRates } from '../src/lib/rateStore';
 import { colors, font, radius, spacing } from '../src/theme';
@@ -23,7 +23,10 @@ const DEFAULT = { tripName: 'My Trip', home: 'USD', dailyBudget: '', expenses: [
 export default function Budget() {
   const insets = useSafeAreaInsets();
   const { isPro } = usePro();
-  const [table, setTable] = useState(null);
+  const { currencyMap, applyRates } = useCurrencies();
+  const [rawTable, setRawTable] = useState(null);
+  // Overlay any user-added currencies' manual rates the feed doesn't cover.
+  const table = useMemo(() => applyRates(rawTable), [rawTable, applyRates]);
   const [data, setData] = useState(DEFAULT);
   const [loaded, setLoaded] = useState(false);
   const [picker, setPicker] = useState(null); // 'home' | 'expense' | null
@@ -38,9 +41,9 @@ export default function Budget() {
     let alive = true;
     (async () => {
       const initial = await loadRates();
-      if (alive) setTable(initial);
+      if (alive) setRawTable(initial);
       const fresh = await refreshRates();
-      if (alive && fresh) setTable(fresh);
+      if (alive && fresh) setRawTable(fresh);
       try {
         const raw = await AsyncStorage.getItem(KEY);
         if (raw && alive) {
@@ -88,7 +91,7 @@ export default function Budget() {
   const pct = dailyBudgetNum > 0 ? Math.min(1, todayTotal / dailyBudgetNum) : 0;
   const over = dailyBudgetNum > 0 && todayTotal > dailyBudgetNum;
 
-  const homeSym = CURRENCY_MAP[data.home]?.symbol || '';
+  const homeSym = currencyMap[data.home]?.symbol || '';
   const fmt = (n) =>
     (n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -138,7 +141,7 @@ export default function Budget() {
             <View style={styles.headerField}>
               <Text style={styles.fieldLabel}>Home currency</Text>
               <Pressable onPress={() => setPicker('home')} style={styles.chip}>
-                <Text style={styles.chipFlag}>{CURRENCY_MAP[data.home]?.flag}</Text>
+                <Text style={styles.chipFlag}>{currencyMap[data.home]?.flag}</Text>
                 <Text style={styles.chipCode}>{data.home}</Text>
                 <Text style={styles.chipCaret}>▾</Text>
               </Pressable>
@@ -203,7 +206,7 @@ export default function Budget() {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.expLabel}>{e.label}</Text>
                   <Text style={styles.expOrig}>
-                    {CURRENCY_MAP[e.currency]?.flag} {fmt(e.amount)} {e.currency}
+                    {currencyMap[e.currency]?.flag} {fmt(e.amount)} {e.currency}
                   </Text>
                 </View>
                 <Text style={styles.expConv}>
@@ -242,7 +245,7 @@ export default function Budget() {
 
             <View style={styles.addRow}>
               <Pressable onPress={() => setPicker('expense')} style={styles.chip}>
-                <Text style={styles.chipFlag}>{CURRENCY_MAP[exCurrency]?.flag}</Text>
+                <Text style={styles.chipFlag}>{currencyMap[exCurrency]?.flag}</Text>
                 <Text style={styles.chipCode}>{exCurrency}</Text>
                 <Text style={styles.chipCaret}>▾</Text>
               </Pressable>

@@ -1,12 +1,14 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { CurrenciesProvider } from '../src/lib/currencies';
 import { ProProvider } from '../src/lib/pro';
 import { colors } from '../src/theme';
 
 export default function RootLayout() {
   return (
     <ProProvider>
+    <CurrenciesProvider>
     <SafeAreaProvider>
       <StatusBar style="light" />
       <Stack
@@ -30,9 +32,11 @@ export default function RootLayout() {
         <Stack.Screen name="survival" options={{ title: 'Survival Guide' }} />
         <Stack.Screen name="budget" options={{ title: 'Trip Budget' }} />
         <Stack.Screen name="settings" options={{ title: 'Settings' }} />
+        <Stack.Screen name="add-currency" options={{ title: 'Add a Currency' }} />
         <Stack.Screen name="pro" options={{ title: 'Roamkit Pro', presentation: 'modal' }} />
       </Stack>
     </SafeAreaProvider>
+    </CurrenciesProvider>
     </ProProvider>
   );
 }

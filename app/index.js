@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { useMemo } from 'react';
 import {
   Linking,
   Pressable,
@@ -30,6 +31,20 @@ export default function Home() {
   const tileWidth =
     (contentWidth - sidePad * 2 - gutter * (columns - 1)) / columns;
 
+  // Order tiles so a free user sees the tools they can actually use first.
+  // Band 0: usable now (free tools + free-with-Pro-extras like Phrasebook).
+  // Band 1: locked Pro tools — sink to the bottom until the user is Pro.
+  // Band 2: "Soon" tools — always last. Sort is stable, so the hand-picked
+  // order within each band is preserved. Once Pro, every tool is band 0.
+  const sortedTools = useMemo(() => {
+    const band = (t) => {
+      if (t.status !== 'active') return 2;
+      if (t.pro && !isPro) return 1;
+      return 0;
+    };
+    return [...TOOLS].sort((a, b) => band(a) - band(b));
+  }, [isPro]);
+
   return (
     <ScrollView
       style={styles.screen}
@@ -55,7 +70,7 @@ export default function Home() {
         </Text>
 
         <View style={[styles.grid, { marginTop: spacing.xl }]}>
-          {TOOLS.map((tool) => {
+          {sortedTools.map((tool) => {
             const isActive = tool.status === 'active';
             const locked = tool.pro && !isPro;
             const onPress = () => {
@@ -98,10 +113,11 @@ export default function Home() {
                     <Text style={styles.proText}>🔒 PRO</Text>
                   </View>
                 )}
-                {/* Free tool with a Pro extra inside (e.g. phrasebook audio). */}
+                {/* Free tool with a Pro extra inside (e.g. phrasebook audio).
+                    Uses the same amber 🔒 PRO badge as fully-locked Pro tools. */}
                 {!locked && tool.proHint && !isPro && (
-                  <View style={[styles.proBadge, styles.proHintBadge]}>
-                    <Text style={styles.proText}>PRO</Text>
+                  <View style={styles.proBadge}>
+                    <Text style={styles.proText}>🔒 PRO</Text>
                   </View>
                 )}
                 {isActive && !locked && !(tool.proHint && !isPro) && (
@@ -248,7 +264,6 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   proBadgeOwned: { backgroundColor: colors.success },
-  proHintBadge: { backgroundColor: colors.accent },
   proText: {
     color: '#0B1220',
     fontSize: 9,
