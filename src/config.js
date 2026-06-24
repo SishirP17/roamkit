@@ -2,7 +2,7 @@
 export const ADMIN_EMAIL = 'reyghim1093@gmail.com';
 export const APP_NAME = 'Roamkit';
 export const APP_VERSION = '1.0.0';
-export const PRIVACY_URL = 'https://roamkit.app/privacy'; // update once hosted
+export const PRIVACY_URL = 'https://sishirp17.github.io/roamkit-privacy/';
 
 // Tip jar link (Ko-fi).
 export const TIP_URL = 'https://ko-fi.com/roamkit';
