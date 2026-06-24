@@ -1,0 +1,90 @@
+import { tileColors } from '../theme';
+
+// The toolkit catalog. Add an entry here + a screen under app/ to ship a new
+// tool. `status: 'active'` tools are tappable; 'soon' shows a Coming Soon badge.
+// This single list is what will eventually be driven by the admin / request
+// system you described.
+export const TOOLS = [
+  {
+    id: 'currency',
+    title: 'Currency',
+    subtitle: 'Convert money offline',
+    icon: '💱',
+    color: tileColors.green,
+    route: '/currency',
+    status: 'active',
+  },
+  {
+    id: 'budget',
+    title: 'Trip Budget',
+    subtitle: 'Track spending abroad',
+    icon: '💰',
+    color: tileColors.amber,
+    route: '/budget',
+    status: 'active',
+    pro: true,
+  },
+  {
+    id: 'units',
+    title: 'Units',
+    subtitle: 'Length, weight, temp',
+    icon: '📏',
+    color: tileColors.blue,
+    route: '/units',
+    status: 'active',
+  },
+  {
+    id: 'tip',
+    title: 'Tip & Split',
+    subtitle: 'Split the bill',
+    icon: '🧾',
+    color: tileColors.amber,
+    route: '/tip',
+    status: 'active',
+  },
+  {
+    id: 'timezones',
+    title: 'World Clock',
+    subtitle: 'Timezones at a glance',
+    icon: '🕑',
+    color: tileColors.purple,
+    route: '/timezones',
+    status: 'active',
+  },
+  {
+    id: 'phrasebook',
+    title: 'Phrasebook',
+    subtitle: 'Key travel phrases',
+    icon: '💬',
+    color: tileColors.pink,
+    route: '/phrasebook',
+    status: 'active',
+  },
+  {
+    id: 'flashlight',
+    title: 'Flashlight',
+    subtitle: 'Light & SOS signal',
+    icon: '🔦',
+    color: tileColors.orange,
+    route: '/flashlight',
+    status: 'active',
+  },
+  {
+    id: 'compass',
+    title: 'Compass',
+    subtitle: 'Find your bearing',
+    icon: '🧭',
+    color: tileColors.teal,
+    route: '/compass',
+    status: 'soon',
+  },
+  {
+    id: 'imgpdf',
+    title: 'Images → PDF',
+    subtitle: 'Combine into a PDF',
+    icon: '🖼️',
+    color: tileColors.slate,
+    route: '/images-to-pdf',
+    status: 'soon',
+  },
+];

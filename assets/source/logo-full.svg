@@ -1,0 +1,41 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101B33"/>
+      <stop offset="1" stop-color="#0B1220"/>
+    </linearGradient>
+    <linearGradient id="north" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="#7AA3FF"/>
+      <stop offset="1" stop-color="#5B8CFF"/>
+    </linearGradient>
+    <linearGradient id="south" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="#3DD68C"/>
+      <stop offset="1" stop-color="#2FB87A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Full-bleed background; the OS applies its own corner mask -->
+  <rect x="0" y="0" width="1024" height="1024" fill="url(#bg)"/>
+
+  <g transform="rotate(18 512 512)">
+    <!-- Compass ring -->
+    <circle cx="512" cy="512" r="312" fill="none" stroke="#26334D" stroke-width="22"/>
+    <circle cx="512" cy="512" r="312" fill="none" stroke="#33446b" stroke-width="22" stroke-dasharray="6 54" stroke-linecap="round"/>
+
+    <!-- Cardinal ticks -->
+    <g fill="#5B6A88">
+      <rect x="503" y="150" width="18" height="58" rx="9"/>
+      <rect x="503" y="816" width="18" height="58" rx="9"/>
+      <rect x="816" y="503" width="58" height="18" rx="9"/>
+      <rect x="150" y="503" width="58" height="18" rx="9"/>
+    </g>
+
+    <!-- Needle (north = blue, south = green) -->
+    <polygon points="512,236 566,512 458,512" fill="url(#north)"/>
+    <polygon points="512,788 566,512 458,512" fill="url(#south)"/>
+
+    <!-- Hub -->
+    <circle cx="512" cy="512" r="46" fill="#0B1220"/>
+    <circle cx="512" cy="512" r="24" fill="#F4F7FF"/>
+  </g>
+</svg>

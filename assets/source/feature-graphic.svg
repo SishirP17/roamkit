@@ -1,0 +1,39 @@
+<svg width="1024" height="500" viewBox="0 0 1024 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101B33"/>
+      <stop offset="1" stop-color="#0B1220"/>
+    </linearGradient>
+    <linearGradient id="north" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="#7AA3FF"/>
+      <stop offset="1" stop-color="#5B8CFF"/>
+    </linearGradient>
+    <linearGradient id="south" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="#3DD68C"/>
+      <stop offset="1" stop-color="#2FB87A"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="500" fill="url(#bg)"/>
+
+  <!-- Compass mark on the left -->
+  <g transform="translate(250 250) scale(0.62) rotate(18)">
+    <circle cx="0" cy="0" r="250" fill="none" stroke="#3a4d76" stroke-width="20"/>
+    <circle cx="0" cy="0" r="250" fill="none" stroke="#4a5f8f" stroke-width="20" stroke-dasharray="5 44" stroke-linecap="round"/>
+    <g fill="#7184a8">
+      <rect x="-8" y="-278" width="16" height="48" rx="8"/>
+      <rect x="-8" y="230" width="16" height="48" rx="8"/>
+      <rect x="230" y="-8" width="48" height="16" rx="8"/>
+      <rect x="-278" y="-8" width="48" height="16" rx="8"/>
+    </g>
+    <polygon points="0,-222 44,0 -44,0" fill="url(#north)"/>
+    <polygon points="0,222 44,0 -44,0" fill="url(#south)"/>
+    <circle cx="0" cy="0" r="38" fill="#0B1220"/>
+    <circle cx="0" cy="0" r="20" fill="#F4F7FF"/>
+  </g>
+
+  <!-- Wordmark + tagline -->
+  <text x="470" y="225" font-family="Arial, Helvetica, sans-serif" font-size="96" font-weight="800" fill="#F4F7FF">Roamkit</text>
+  <text x="472" y="285" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="400" fill="#9AA7C2">Travel tools that work offline.</text>
+  <text x="472" y="345" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#5B8CFF" letter-spacing="2">CURRENCY · UNITS · CLOCK · MORE</text>
+</svg>
