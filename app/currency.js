@@ -273,12 +273,17 @@ export default function CurrencyConverter() {
                 const selected =
                   (pickerFor === 'from' && item.code === from) ||
                   (pickerFor === 'to' && item.code === to);
+                // In Compare's "add" list, grey out ones already shown.
+                const alreadyAdded =
+                  pickerFor === 'add' && (item.code === from || targets.includes(item.code));
                 return (
                   <Pressable
+                    disabled={alreadyAdded}
                     onPress={() => pick(item.code)}
                     style={({ pressed }) => [
                       styles.currencyItem,
                       selected && styles.currencyItemSelected,
+                      alreadyAdded && { opacity: 0.35 },
                       pressed && { backgroundColor: colors.surfaceAlt },
                     ]}
                   >
@@ -287,7 +292,9 @@ export default function CurrencyConverter() {
                       <Text style={styles.currencyCode}>{item.code}</Text>
                       <Text style={styles.currencyName}>{item.name}</Text>
                     </View>
-                    <Text style={styles.currencySymbol}>{item.symbol}</Text>
+                    <Text style={styles.currencySymbol}>
+                      {alreadyAdded ? 'Added' : item.symbol}
+                    </Text>
                   </Pressable>
                 );
               }}
