@@ -26,9 +26,10 @@ still works. Everything runs on your device.
 
 ★ WHAT'S INSIDE
 
-• Currency Converter — Convert between 30+ currencies completely offline. Rates
-  are built in, and refresh automatically whenever you have internet so you're
-  always up to date. It even tells you how fresh the rates are.
+• Currency Converter — Convert between 30+ currencies completely offline, and
+  compare several at once. Rates are built in and refresh automatically whenever
+  you have internet, so you're always up to date. It even tells you how fresh the
+  rates are. Add your own currencies too.
 
 • Unit Converter — Length, weight, temperature and volume. Miles to kilometers,
   pounds to kilograms, Fahrenheit to Celsius, and more.
@@ -42,8 +43,24 @@ still works. Everything runs on your device.
 • Phrasebook — Essential travel phrases in Spanish, French, German, Italian,
   Portuguese and Japanese, with pronunciation. Tap to copy.
 
+• Sun Times — Offline sunrise and sunset times for wherever you are, calculated
+  on-device. Great for planning hikes and golden-hour photos.
+
+• Survival Guide — Quick offline reference for emergencies on the road.
+
 • Flashlight & SOS — Turn your phone into a light, an emergency SOS signal, or a
   strobe. Great for camping and emergencies.
+
+★ ROAMKIT PRO (optional one-time purchase)
+
+Unlock the Pro tools with a single purchase — no subscription:
+
+• Trip Budget & Expenses — Track spending abroad, log expenses in any currency,
+  and see your daily and trip totals converted to your home currency.
+
+• Spoken Phrasebook — Hear travel phrases spoken aloud.
+
+• Compass — A simple offline compass for finding your way.
 
 ★ WHY ROAMKIT
 
