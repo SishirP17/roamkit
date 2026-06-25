@@ -33,6 +33,9 @@ yarn-error.*
 # local env files
 .env*.local
 
+# Vercel
+.vercel/
+
 # local agent / editor state
 .claude/
 
