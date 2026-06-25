@@ -1,4 +1,4 @@
-# Roamkit — Google Play Store Listing
+# RoamKit — Google Play Store Listing
 
 Copy/paste these into the Play Console "Main store listing" and related forms.
 
@@ -6,9 +6,9 @@ Copy/paste these into the Play Console "Main store listing" and related forms.
 
 ## App name (max 30 chars)
 ```
-Roamkit: Offline Travel Tools
+RoamKit: Offline Travel Tools
 ```
-(29 chars. Alternative if you want shorter: `Roamkit — Travel Toolkit`)
+(29 chars. Alternative if you want shorter: `RoamKit — Travel Toolkit`)
 
 ## Short description (max 80 chars)
 ```
@@ -18,10 +18,10 @@ Offline currency converter, unit converter, world clock & travel tools. No data.
 
 ## Full description (max 4000 chars)
 ```
-Roamkit is your offline travel toolkit — a set of genuinely useful tools that
+RoamKit is your offline travel toolkit — a set of genuinely useful tools that
 work anywhere in the world, with no internet connection required.
 
-Landed in a new country with no SIM and roaming that costs a fortune? Roamkit
+Landed in a new country with no SIM and roaming that costs a fortune? RoamKit
 still works. Everything runs on your device.
 
 ★ WHAT'S INSIDE
@@ -72,7 +72,7 @@ Unlock the Pro tools with a single purchase — no subscription:
 
 ★ ALWAYS GROWING
 
-Roamkit is a toolkit that keeps expanding. Got an idea for a tool you'd love to
+RoamKit is a toolkit that keeps expanding. Got an idea for a tool you'd love to
 have? Tap "Request a tool" right inside the app and tell us — new tools are
 added over time.
 
@@ -91,7 +91,7 @@ Pack light. Roam far. Stay offline.
 ---
 
 ## Content rating questionnaire — expected answers
-Roamkit has no objectionable content. Expected result: **Everyone / PEGI 3.**
+RoamKit has no objectionable content. Expected result: **Everyone / PEGI 3.**
 - Violence: No
 - Sexual content: No
 - Profanity: No

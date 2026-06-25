@@ -28,7 +28,7 @@ export default function Settings() {
 
       <Row
         icon={isPro ? '✅' : '⭐'}
-        title={isPro ? 'Roamkit Pro' : 'Get Roamkit Pro'}
+        title={isPro ? 'RoamKit Pro' : 'Get RoamKit Pro'}
         sub={isPro ? "You're a Pro member" : 'Unlock the premium tools'}
         onPress={() => router.push('/pro')}
       />
@@ -65,7 +65,7 @@ export default function Settings() {
       <Row icon="📦" title="Version" sub={VERSION} />
 
       <Text style={styles.footer}>
-        Roamkit works fully offline. The only time it uses the internet is to
+        RoamKit works fully offline. The only time it uses the internet is to
         refresh currency exchange rates — and even then, it keeps the last rates
         saved on your device.
       </Text>

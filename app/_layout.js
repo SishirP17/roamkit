@@ -33,7 +33,7 @@ export default function RootLayout() {
         <Stack.Screen name="budget" options={{ title: 'Trip Budget' }} />
         <Stack.Screen name="settings" options={{ title: 'Settings' }} />
         <Stack.Screen name="add-currency" options={{ title: 'Add a Currency' }} />
-        <Stack.Screen name="pro" options={{ title: 'Roamkit Pro', presentation: 'modal' }} />
+        <Stack.Screen name="pro" options={{ title: 'RoamKit Pro', presentation: 'modal' }} />
       </Stack>
     </SafeAreaProvider>
     </CurrenciesProvider>

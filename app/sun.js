@@ -56,7 +56,7 @@ export default function Sun() {
           </Text>
           <Text style={styles.dim}>
             {status === 'denied'
-              ? 'Roamkit needs your location to work out local sunrise and sunset. It stays on your device.'
+              ? 'RoamKit needs your location to work out local sunrise and sunset. It stays on your device.'
               : 'Make sure location is turned on, then try again.'}
           </Text>
           <Pressable onPress={load} style={styles.btn}>

@@ -9,9 +9,9 @@ export default function LockedNotice({ name = 'This is a Pro tool' }) {
     <View style={styles.wrap}>
       <Text style={styles.icon}>🔒</Text>
       <Text style={styles.title}>{name}</Text>
-      <Text style={styles.sub}>Unlock Roamkit Pro to use it.</Text>
+      <Text style={styles.sub}>Unlock RoamKit Pro to use it.</Text>
       <Pressable onPress={() => router.push('/pro')} style={styles.btn}>
-        <Text style={styles.btnText}>Unlock Roamkit Pro</Text>
+        <Text style={styles.btnText}>Unlock RoamKit Pro</Text>
       </Pressable>
     </View>
   );

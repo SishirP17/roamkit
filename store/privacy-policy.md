@@ -1,13 +1,13 @@
-# Roamkit — Privacy Policy
+# RoamKit — Privacy Policy
 
 _Last updated: 23 June 2026_
 
-Roamkit ("the app", "we") is an offline travel toolkit. We built it privacy-first:
+RoamKit ("the app", "we") is an offline travel toolkit. We built it privacy-first:
 **the app has no accounts, no analytics, no ads, and no tracking.**
 
 ## What we collect
 
-**Nothing personal.** Roamkit does not collect, store, or transmit any personal
+**Nothing personal.** RoamKit does not collect, store, or transmit any personal
 information. There is no sign-up and no user profile.
 
 ## Data stored on your device
@@ -22,7 +22,7 @@ This information never leaves your device and is removed if you uninstall the ap
 
 ## Network use
 
-Roamkit is designed to work fully offline. It connects to the internet in only
+RoamKit is designed to work fully offline. It connects to the internet in only
 one situation:
 
 - **Currency exchange rates.** When you open the Currency tool and you are
@@ -38,11 +38,11 @@ third-party provider.
 
 If you tap "Request a tool", the app opens your own email application with a
 prefilled message. Sending it is entirely your choice, and the email is handled
-by your email provider — Roamkit does not send anything automatically.
+by your email provider — RoamKit does not send anything automatically.
 
 ## Children's privacy
 
-Roamkit does not knowingly collect any data from anyone, including children.
+RoamKit does not knowingly collect any data from anyone, including children.
 
 ## Changes
 

@@ -33,7 +33,7 @@
   </g>
 
   <!-- Wordmark + tagline -->
-  <text x="470" y="225" font-family="Arial, Helvetica, sans-serif" font-size="96" font-weight="800" fill="#F4F7FF">Roamkit</text>
+  <text x="470" y="225" font-family="Arial, Helvetica, sans-serif" font-size="96" font-weight="800" fill="#F4F7FF">RoamKit</text>
   <text x="472" y="285" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="400" fill="#9AA7C2">Travel tools that work offline.</text>
   <text x="472" y="345" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#5B8CFF" letter-spacing="2">CURRENCY · UNITS · CLOCK · MORE</text>
 </svg>

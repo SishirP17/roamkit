@@ -1,15 +1,15 @@
-# Roamkit — Activating Real Billing (RevenueCat)
+# RoamKit — Activating Real Billing (RevenueCat)
 
 The app already has a Pro paywall and a clean entitlement seam (`src/lib/pro.js`).
 Right now Pro unlocks **locally** for testing. This guide turns on **real
-payments** once Roamkit is on Google Play.
+payments** once RoamKit is on Google Play.
 
 > Order matters — billing literally cannot be tested until the app is on a Play
 > track with a product configured. Do these in sequence.
 
 ## Prerequisites (must be done first)
 1. Google Play Developer account created + identity verified.
-2. Roamkit uploaded to a Play track (internal/closed testing is fine).
+2. RoamKit uploaded to a Play track (internal/closed testing is fine).
 3. A **payments/merchant profile** set up in Play Console (to receive money).
 
 ## Step 1 — Create the in-app product in Play Console

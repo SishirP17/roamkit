@@ -1,4 +1,4 @@
-# Roamkit
+# RoamKit
 
 A cross-platform (iOS + Android + Web) **offline-first travel toolkit**, built with
 Expo + Expo Router. Every tool works with no internet, and the home screen is a

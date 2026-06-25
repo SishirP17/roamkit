@@ -96,7 +96,7 @@ export default function Paywall() {
 
       {isPro ? (
         <View style={styles.ownedCard}>
-          <Text style={styles.ownedText}>✓ You have Roamkit Pro</Text>
+          <Text style={styles.ownedText}>✓ You have RoamKit Pro</Text>
         </View>
       ) : (
         <>

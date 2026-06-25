@@ -1,4 +1,4 @@
-# Roamkit — Deployment Guide (Google Play)
+# RoamKit — Deployment Guide (Google Play)
 
 This walks you from "code on my laptop" to "installable on phones via Play
 Store". Commands you run are in code blocks. Anything that opens a browser /
@@ -56,7 +56,7 @@ eas build --platform android --profile production
 ## 4. Create the app in Play Console **(you)**
 
 1. https://play.google.com/console → **Create app**
-2. App name: **Roamkit**, language English, type **App**, **Free**
+2. App name: **RoamKit**, language English, type **App**, **Free**
 3. Accept the declarations.
 
 ## 5. Fill the store listing **(you)**
@@ -90,7 +90,7 @@ Google requires a public URL. Easiest free option — GitHub Pages:
 
 1. Play Console → **Testing → Closed testing → Create track**
 2. **Create new release** → upload your `.aab` from step 3
-3. Add release notes (e.g. "First release of Roamkit — 6 offline travel tools.")
+3. Add release notes (e.g. "First release of RoamKit — 6 offline travel tools.")
 4. **Testers**: create an email list and add **at least 12** testers (friends/
    family with Android). They tap the opt-in link, install from Play, and just
    need to keep it installed.
@@ -103,7 +103,7 @@ Console will let you **apply for production access**.
 
 1. **Production → Create release** → reuse the same build (or a newer one)
 2. Submit for review. Google review is usually 1–3 days.
-3. 🎉 Roamkit is live for everyone.
+3. 🎉 RoamKit is live for everyone.
 
 ---
 

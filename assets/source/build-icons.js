@@ -1,4 +1,4 @@
-// Rasterizes the Roamkit SVG logo into all the PNG assets Expo needs.
+// Rasterizes the RoamKit SVG logo into all the PNG assets Expo needs.
 // Run with: node assets/source/build-icons.js
 const fs = require('fs');
 const path = require('path');
@@ -23,7 +23,7 @@ async function render(svg, size, file, bg) {
 }
 
 (async () => {
-  console.log('Building Roamkit icons…');
+  console.log('Building RoamKit icons…');
   // Main app icon (opaque, OS applies corner mask)
   await render(full, 1024, 'icon.png', NAVY);
   // Android adaptive foreground (transparent, mark only)
