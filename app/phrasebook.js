@@ -16,6 +16,8 @@ const SPEAK_LOCALE = {
   it: 'it-IT',
   pt: 'pt-PT',
   ja: 'ja-JP',
+  hi: 'hi-IN',
+  zh: 'zh-CN',
 };
 
 export default function Phrasebook() {

@@ -31,16 +31,20 @@ export default function Home() {
   const tileWidth =
     (contentWidth - sidePad * 2 - gutter * (columns - 1)) / columns;
 
-  // Order tiles so a free user sees the tools they can actually use first.
-  // Band 0: usable now (free tools + free-with-Pro-extras like Phrasebook).
-  // Band 1: locked Pro tools — sink to the bottom until the user is Pro.
-  // Band 2: "Soon" tools — always last. Sort is stable, so the hand-picked
-  // order within each band is preserved. Once Pro, every tool is band 0.
+  // Tile order. Currency is always first; Tip & Split is always the last active
+  // tool; "Soon" tools are always dead last. For a FREE user we float the locked
+  // Pro tools up near the top (band 1) to entice the upgrade. For a Pro user
+  // there's nothing to entice, so those tools just fall into the normal band 2.
+  // Sort is stable, so the hand-picked order within each band is preserved.
+  //   0: Currency (always first)   1: Pro tools (free users only, to entice)
+  //   2: everything else           3: Tip & Split   4: "Soon" tools (last)
   const sortedTools = useMemo(() => {
     const band = (t) => {
-      if (t.status !== 'active') return 2;
+      if (t.status !== 'active') return 4;
+      if (t.id === 'currency') return 0;
+      if (t.id === 'tip') return 3;
       if (t.pro && !isPro) return 1;
-      return 0;
+      return 2;
     };
     return [...TOOLS].sort((a, b) => band(a) - band(b));
   }, [isPro]);

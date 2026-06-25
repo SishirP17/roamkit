@@ -1,5 +1,5 @@
 // Offline travel phrasebook. Each phrase has translations per language code.
-// For non-Latin scripts (Japanese) a `p` pronunciation (romaji) is included.
+// For non-Latin scripts (Japanese, Hindi, Chinese) a `p` pronunciation is included.
 export const LANGUAGES = [
   { code: 'es', name: 'Spanish', flag: '🇪🇸' },
   { code: 'fr', name: 'French', flag: '🇫🇷' },
@@ -7,6 +7,8 @@ export const LANGUAGES = [
   { code: 'it', name: 'Italian', flag: '🇮🇹' },
   { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
   { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+  { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
+  { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
 ];
 
 // t = translation text, p = pronunciation (optional)
@@ -22,6 +24,8 @@ export const PHRASES = [
         it: { t: 'Ciao' },
         pt: { t: 'Olá' },
         ja: { t: 'こんにちは', p: 'Konnichiwa' },
+        hi: { t: 'नमस्ते', p: 'Namaste' },
+        zh: { t: '你好', p: 'Nǐ hǎo' },
       },
       {
         en: 'Thank you',
@@ -31,6 +35,8 @@ export const PHRASES = [
         it: { t: 'Grazie' },
         pt: { t: 'Obrigado' },
         ja: { t: 'ありがとう', p: 'Arigatō' },
+        hi: { t: 'धन्यवाद', p: 'Dhanyavaad' },
+        zh: { t: '谢谢', p: 'Xièxie' },
       },
       {
         en: 'Yes / No',
@@ -40,6 +46,8 @@ export const PHRASES = [
         it: { t: 'Sì / No' },
         pt: { t: 'Sim / Não' },
         ja: { t: 'はい / いいえ', p: 'Hai / Iie' },
+        hi: { t: 'हाँ / नहीं', p: 'Haan / Nahin' },
+        zh: { t: '是 / 不是', p: 'Shì / Bù shì' },
       },
       {
         en: 'Please',
@@ -49,6 +57,8 @@ export const PHRASES = [
         it: { t: 'Per favore' },
         pt: { t: 'Por favor' },
         ja: { t: 'お願いします', p: 'Onegai shimasu' },
+        hi: { t: 'कृपया', p: 'Kripya' },
+        zh: { t: '请', p: 'Qǐng' },
       },
       {
         en: 'Excuse me / Sorry',
@@ -58,6 +68,8 @@ export const PHRASES = [
         it: { t: 'Mi scusi' },
         pt: { t: 'Com licença' },
         ja: { t: 'すみません', p: 'Sumimasen' },
+        hi: { t: 'माफ़ कीजिए', p: 'Maaf kijiye' },
+        zh: { t: '对不起', p: 'Duìbuqǐ' },
       },
       {
         en: 'Do you speak English?',
@@ -67,6 +79,8 @@ export const PHRASES = [
         it: { t: 'Parla inglese?' },
         pt: { t: 'Você fala inglês?' },
         ja: { t: '英語を話せますか？', p: 'Eigo o hanasemasu ka?' },
+        hi: { t: 'क्या आप अंग्रेज़ी बोलते हैं?', p: 'Kya aap angrezi bolte hain?' },
+        zh: { t: '你会说英语吗？', p: 'Nǐ huì shuō Yīngyǔ ma?' },
       },
     ],
   },
@@ -81,6 +95,8 @@ export const PHRASES = [
         it: { t: "Dov'è il bagno?" },
         pt: { t: 'Onde fica o banheiro?' },
         ja: { t: 'トイレはどこですか？', p: 'Toire wa doko desu ka?' },
+        hi: { t: 'शौचालय कहाँ है?', p: 'Shauchalay kahan hai?' },
+        zh: { t: '洗手间在哪里？', p: 'Xǐshǒujiān zài nǎlǐ?' },
       },
       {
         en: 'How much is it?',
@@ -90,6 +106,8 @@ export const PHRASES = [
         it: { t: 'Quanto costa?' },
         pt: { t: 'Quanto custa?' },
         ja: { t: 'いくらですか？', p: 'Ikura desu ka?' },
+        hi: { t: 'यह कितने का है?', p: 'Yah kitne ka hai?' },
+        zh: { t: '多少钱？', p: 'Duōshǎo qián?' },
       },
       {
         en: 'Left / Right',
@@ -99,6 +117,8 @@ export const PHRASES = [
         it: { t: 'Sinistra / Destra' },
         pt: { t: 'Esquerda / Direita' },
         ja: { t: '左 / 右', p: 'Hidari / Migi' },
+        hi: { t: 'बायाँ / दायाँ', p: 'Baayan / Daayan' },
+        zh: { t: '左 / 右', p: 'Zuǒ / Yòu' },
       },
       {
         en: "I'm lost",
@@ -108,6 +128,8 @@ export const PHRASES = [
         it: { t: 'Mi sono perso' },
         pt: { t: 'Estou perdido' },
         ja: { t: '道に迷いました', p: 'Michi ni mayoimashita' },
+        hi: { t: 'मैं रास्ता भटक गया हूँ', p: 'Main raasta bhatak gaya hoon' },
+        zh: { t: '我迷路了', p: 'Wǒ mílù le' },
       },
       {
         en: 'Where is the station?',
@@ -117,6 +139,8 @@ export const PHRASES = [
         it: { t: "Dov'è la stazione?" },
         pt: { t: 'Onde fica a estação?' },
         ja: { t: '駅はどこですか？', p: 'Eki wa doko desu ka?' },
+        hi: { t: 'स्टेशन कहाँ है?', p: 'Station kahan hai?' },
+        zh: { t: '车站在哪里？', p: 'Chēzhàn zài nǎlǐ?' },
       },
     ],
   },
@@ -131,6 +155,8 @@ export const PHRASES = [
         it: { t: 'Un tavolo per due, per favore' },
         pt: { t: 'Uma mesa para dois, por favor' },
         ja: { t: '二人です', p: 'Futari desu' },
+        hi: { t: 'दो लोगों के लिए एक मेज़, कृपया', p: 'Do logon ke liye ek mez, kripya' },
+        zh: { t: '请给两个人的桌子', p: 'Qǐng gěi liǎng gè rén de zhuōzi' },
       },
       {
         en: 'The menu, please',
@@ -140,6 +166,8 @@ export const PHRASES = [
         it: { t: 'Il menù, per favore' },
         pt: { t: 'O cardápio, por favor' },
         ja: { t: 'メニューをください', p: 'Menyū o kudasai' },
+        hi: { t: 'मेन्यू दीजिए, कृपया', p: 'Menu dijiye, kripya' },
+        zh: { t: '请给我菜单', p: 'Qǐng gěi wǒ càidān' },
       },
       {
         en: 'Water, please',
@@ -149,6 +177,8 @@ export const PHRASES = [
         it: { t: 'Acqua, per favore' },
         pt: { t: 'Água, por favor' },
         ja: { t: 'お水をください', p: 'Omizu o kudasai' },
+        hi: { t: 'पानी दीजिए, कृपया', p: 'Paani dijiye, kripya' },
+        zh: { t: '请给我水', p: 'Qǐng gěi wǒ shuǐ' },
       },
       {
         en: 'The bill, please',
@@ -158,6 +188,8 @@ export const PHRASES = [
         it: { t: 'Il conto, per favore' },
         pt: { t: 'A conta, por favor' },
         ja: { t: 'お会計をお願いします', p: 'Okaikei o onegai shimasu' },
+        hi: { t: 'बिल दीजिए, कृपया', p: 'Bill dijiye, kripya' },
+        zh: { t: '请买单', p: 'Qǐng mǎidān' },
       },
       {
         en: 'It was delicious',
@@ -167,6 +199,8 @@ export const PHRASES = [
         it: { t: 'Era delizioso' },
         pt: { t: 'Estava delicioso' },
         ja: { t: 'おいしかったです', p: 'Oishikatta desu' },
+        hi: { t: 'यह स्वादिष्ट था', p: 'Yah swaadisht tha' },
+        zh: { t: '很好吃', p: 'Hěn hǎochī' },
       },
     ],
   },
@@ -181,6 +215,8 @@ export const PHRASES = [
         it: { t: 'Aiuto!' },
         pt: { t: 'Socorro!' },
         ja: { t: '助けて！', p: 'Tasukete!' },
+        hi: { t: 'मदद करो!', p: 'Madad karo!' },
+        zh: { t: '救命！', p: 'Jiùmìng!' },
       },
       {
         en: 'Call the police',
@@ -190,6 +226,8 @@ export const PHRASES = [
         it: { t: 'Chiami la polizia' },
         pt: { t: 'Chame a polícia' },
         ja: { t: '警察を呼んでください', p: 'Keisatsu o yonde kudasai' },
+        hi: { t: 'पुलिस को बुलाओ', p: 'Police ko bulao' },
+        zh: { t: '请叫警察', p: 'Qǐng jiào jǐngchá' },
       },
       {
         en: 'I need a doctor',
@@ -199,6 +237,8 @@ export const PHRASES = [
         it: { t: 'Ho bisogno di un medico' },
         pt: { t: 'Preciso de um médico' },
         ja: { t: '医者が必要です', p: 'Isha ga hitsuyō desu' },
+        hi: { t: 'मुझे डॉक्टर चाहिए', p: 'Mujhe doctor chahiye' },
+        zh: { t: '我需要医生', p: 'Wǒ xūyào yīshēng' },
       },
       {
         en: 'Where is the hospital?',
@@ -208,6 +248,8 @@ export const PHRASES = [
         it: { t: "Dov'è l'ospedale?" },
         pt: { t: 'Onde fica o hospital?' },
         ja: { t: '病院はどこですか？', p: 'Byōin wa doko desu ka?' },
+        hi: { t: 'अस्पताल कहाँ है?', p: 'Aspataal kahan hai?' },
+        zh: { t: '医院在哪里？', p: 'Yīyuàn zài nǎlǐ?' },
       },
     ],
   },
