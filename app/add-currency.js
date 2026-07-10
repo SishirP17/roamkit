@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'expo-router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  KeyboardAvoidingView,
-  Platform,
+  ActivityIndicator,
+  FlatList,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -11,262 +12,230 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CURRENCIES } from '../src/data/currencies';
+import { CURRENCY_META } from '../src/data/currencyMeta';
 import { useCurrencies } from '../src/lib/currencies';
-import { parseAmount } from '../src/lib/parseAmount';
-import { loadRates, refreshRates } from '../src/lib/rateStore';
+import { usePro } from '../src/lib/pro';
+import { refreshRates } from '../src/lib/rateStore';
 import { colors, font, radius, spacing } from '../src/theme';
 
 const BUILTIN_CODES = new Set(CURRENCIES.map((c) => c.code));
 
+// Big rates read best without decimals; tiny ones need extra precision
+// (VND ≈ 26,000 · EUR ≈ 0.88 · KWD ≈ 0.31).
+const formatRate = (r) =>
+  r.toLocaleString(undefined, {
+    maximumFractionDigits: r >= 100 ? 0 : r >= 1 ? 2 : 4,
+  });
+
+// Searchable catalog of every currency the live rate feed knows (~160).
+// Browsing is free; adding is Pro. Needs internet — rates are fetched live so
+// the list only ever offers currencies that will actually convert.
 export default function AddCurrency() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { custom, add, remove } = useCurrencies();
+  const { isPro } = usePro();
 
-  const [code, setCode] = useState('');
-  const [name, setName] = useState('');
-  const [symbol, setSymbol] = useState('');
-  const [flag, setFlag] = useState('');
-  const [rate, setRate] = useState('');
-  const [table, setTable] = useState(null);
-  const [savedNote, setSavedNote] = useState(null);
-  const noteTimer = useRef(null);
+  const [search, setSearch] = useState('');
+  const [table, setTable] = useState(null); // fresh network rates only
+  const [status, setStatus] = useState('loading'); // loading | ready | offline
 
-  useEffect(() => () => clearTimeout(noteTimer.current), []);
-
-  // Load the rate table so we can tell the user when a code already has a live
-  // rate (so they don't need to type one).
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      const initial = await loadRates();
-      if (alive) setTable(initial);
-      const fresh = await refreshRates();
-      if (alive && fresh) setTable(fresh);
-    })();
-    return () => {
-      alive = false;
-    };
+  const load = useCallback(async () => {
+    setStatus('loading');
+    const fresh = await refreshRates();
+    if (fresh) {
+      setTable(fresh);
+      setStatus('ready');
+    } else {
+      setStatus('offline');
+    }
   }, []);
 
-  const cleanCode = code.trim().toUpperCase();
-  const liveRate = table?.rates?.[cleanCode];
-  const isBuiltin = BUILTIN_CODES.has(cleanCode);
-  const alreadyCustom = custom.some((c) => c.code === cleanCode);
+  useEffect(() => {
+    load();
+  }, [load]);
 
-  // A manual rate is only required when nothing else knows this currency.
-  const needsRate = cleanCode.length >= 2 && liveRate == null;
-  const rateNum = parseAmount(rate);
-  const canSave =
-    cleanCode.length >= 2 &&
-    cleanCode.length <= 5 &&
-    /^[A-Z]+$/.test(cleanCode) &&
-    !isBuiltin &&
-    (!needsRate || (rateNum > 0));
+  const customCodes = useMemo(() => new Set(custom.map((c) => c.code)), [custom]);
 
-  const status = useMemo(() => {
-    if (cleanCode.length < 2) return null;
-    if (!/^[A-Z]+$/.test(cleanCode))
-      return { tone: 'bad', text: 'Use letters only, e.g. NPR.' };
-    if (isBuiltin)
-      return { tone: 'bad', text: `${cleanCode} is already built in — no need to add it.` };
-    if (alreadyCustom)
-      return { tone: 'warn', text: `You already added ${cleanCode}. Saving will update it.` };
-    if (liveRate != null)
-      return {
-        tone: 'good',
-        text: `✓ Live rate available (1 USD ≈ ${liveRate.toLocaleString(undefined, {
-          maximumFractionDigits: 4,
-        })} ${cleanCode}). A manual rate is optional.`,
-      };
-    return {
-      tone: 'warn',
-      text: `No live rate for ${cleanCode} yet. Enter today's rate below so conversions work offline.`,
-    };
-  }, [cleanCode, isBuiltin, alreadyCustom, liveRate]);
+  const catalog = useMemo(() => {
+    if (!table?.rates) return [];
+    return Object.keys(table.rates)
+      .sort()
+      .map((code) => ({
+        code,
+        name: CURRENCY_META[code]?.name || code,
+        flag: CURRENCY_META[code]?.flag || '🏳️',
+        rate: table.rates[code],
+      }));
+  }, [table]);
 
-  const onSave = () => {
-    if (!canSave) return;
-    add({
-      code: cleanCode,
-      name,
-      symbol,
-      flag,
-      rate: needsRate ? rateNum : null,
-    });
-    setSavedNote(`${cleanCode} added`);
-    setCode('');
-    setName('');
-    setSymbol('');
-    setFlag('');
-    setRate('');
-    clearTimeout(noteTimer.current);
-    noteTimer.current = setTimeout(
-      () => setSavedNote((n) => (n === `${cleanCode} added` ? null : n)),
-      1800
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return catalog;
+    return catalog.filter(
+      (c) => c.code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q)
     );
+  }, [catalog, search]);
+
+  const onAdd = (item) => {
+    if (!isPro) {
+      router.push('/pro');
+      return;
+    }
+    add({ code: item.code, name: item.name, flag: item.flag, symbol: item.code, rate: null });
   };
 
+  // The user's own additions, shown under the catalog (and even offline —
+  // removing one is local and never needs the network).
+  const yourCurrencies =
+    custom.length > 0 ? (
+      <>
+        <Text style={styles.section}>Your currencies</Text>
+        {custom.map((c) => (
+          <View key={c.code} style={styles.customRow}>
+            <Text style={styles.customFlag}>{c.flag}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.customCode}>{c.code}</Text>
+              <Text style={styles.customName}>
+                {c.name}
+                {c.rate ? `  ·  1 USD = ${c.rate} ${c.code}` : '  ·  live rate'}
+              </Text>
+            </View>
+            <Pressable
+              onPress={() => remove(c.code)}
+              hitSlop={12}
+              style={styles.del}
+              accessibilityRole="button"
+              accessibilityLabel={`Remove ${c.name}`}
+            >
+              <Text style={styles.delText}>✕</Text>
+            </Pressable>
+          </View>
+        ))}
+      </>
+    ) : null;
+
   return (
-    <KeyboardAvoidingView
-      style={styles.screen}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={{ padding: spacing.lg, paddingBottom: insets.bottom + spacing.xxl }}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Text style={styles.intro}>
-          Add any currency that isn't in the list — like the Nepalese Rupee. Most
-          world currencies already have live rates; you only type a rate for ones
-          we don't cover.
-        </Text>
-
-        <Text style={styles.label}>Currency code</Text>
-        <TextInput
-          style={styles.input}
-          value={code}
-          onChangeText={setCode}
-          placeholder="NPR"
-          placeholderTextColor={colors.textFaint}
-          autoCapitalize="characters"
-          autoCorrect={false}
-          maxLength={5}
-          selectionColor={colors.accent}
-        />
-        {status && (
-          <Text
-            style={[
-              styles.status,
-              status.tone === 'good' && { color: colors.success },
-              status.tone === 'bad' && { color: colors.danger },
-              status.tone === 'warn' && { color: colors.warning },
-            ]}
-          >
-            {status.text}
-          </Text>
-        )}
-
-        <View style={styles.row}>
-          <View style={{ flex: 2 }}>
-            <Text style={styles.label}>Name</Text>
-            <TextInput
-              style={styles.input}
-              value={name}
-              onChangeText={setName}
-              placeholder="Nepalese Rupee"
-              placeholderTextColor={colors.textFaint}
-              selectionColor={colors.accent}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.label}>Symbol</Text>
-            <TextInput
-              style={styles.input}
-              value={symbol}
-              onChangeText={setSymbol}
-              placeholder="रू"
-              placeholderTextColor={colors.textFaint}
-              selectionColor={colors.accent}
-            />
-          </View>
-        </View>
-
-        <View style={styles.row}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.label}>Flag (emoji)</Text>
-            <TextInput
-              style={styles.input}
-              value={flag}
-              onChangeText={setFlag}
-              placeholder="🇳🇵"
-              placeholderTextColor={colors.textFaint}
-              selectionColor={colors.accent}
-            />
-          </View>
-          <View style={{ flex: 2 }}>
-            <Text style={styles.label}>
-              Rate {needsRate ? '(required)' : '(optional)'}
-            </Text>
-            <View style={styles.rateWrap}>
-              <Text style={styles.ratePrefix}>1 USD =</Text>
+    <View style={styles.screen}>
+      <View style={styles.header}>
+        <Text style={styles.intro}>Find any world currency and add it to your converter.</Text>
+        {status === 'ready' && (
+          <>
+            <View style={styles.searchWrap}>
+              <Text style={styles.searchIcon}>🔍</Text>
               <TextInput
-                style={styles.rateInput}
-                value={rate}
-                onChangeText={setRate}
-                keyboardType="decimal-pad"
-                placeholder={liveRate != null ? 'live' : '133.5'}
+                style={styles.searchInput}
+                value={search}
+                onChangeText={setSearch}
+                placeholder="Type a currency or country…"
                 placeholderTextColor={colors.textFaint}
                 selectionColor={colors.accent}
+                autoCorrect={false}
+                autoCapitalize="none"
               />
-              <Text style={styles.rateSuffix}>{cleanCode || ''}</Text>
-            </View>
-          </View>
-        </View>
-
-        <Pressable
-          onPress={onSave}
-          disabled={!canSave}
-          style={({ pressed }) => [
-            styles.saveBtn,
-            !canSave && styles.saveBtnDisabled,
-            pressed && canSave && { opacity: 0.85 },
-          ]}
-        >
-          <Text style={[styles.saveText, !canSave && { color: colors.textFaint }]}>
-            {savedNote || 'Add currency'}
-          </Text>
-        </Pressable>
-
-        {/* Existing custom currencies */}
-        {custom.length > 0 && (
-          <>
-            <Text style={styles.section}>Your currencies</Text>
-            {custom.map((c) => (
-              <View key={c.code} style={styles.customRow}>
-                <Text style={styles.customFlag}>{c.flag}</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.customCode}>{c.code}</Text>
-                  <Text style={styles.customName}>
-                    {c.name}
-                    {c.rate ? `  ·  1 USD = ${c.rate} ${c.code}` : '  ·  live rate'}
-                  </Text>
-                </View>
-                <Pressable onPress={() => remove(c.code)} hitSlop={10} style={styles.del}>
-                  <Text style={styles.delText}>✕</Text>
+              {search !== '' && (
+                <Pressable
+                  onPress={() => setSearch('')}
+                  hitSlop={12}
+                  accessibilityRole="button"
+                  accessibilityLabel="Clear search"
+                >
+                  <Text style={styles.clear}>✕</Text>
                 </Pressable>
-              </View>
-            ))}
+              )}
+            </View>
+            {table?.date ? (
+              <Text style={styles.updated}>Live rates · updated {table.date}</Text>
+            ) : null}
           </>
         )}
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </View>
+
+      {status === 'loading' && (
+        <View style={styles.center}>
+          <ActivityIndicator color={colors.accent} size="large" />
+          <Text style={styles.centerText}>Loading live rates…</Text>
+        </View>
+      )}
+
+      {status === 'offline' && (
+        <ScrollView
+          contentContainerStyle={{
+            padding: spacing.lg,
+            paddingBottom: insets.bottom + spacing.xxl,
+          }}
+        >
+          <View style={styles.offlineCard}>
+            <Text style={styles.offlineIcon}>📡</Text>
+            <Text style={styles.offlineTitle}>You're offline</Text>
+            <Text style={styles.offlineText}>
+              Connect to the internet to see the currency list with live rates.
+            </Text>
+            <Pressable onPress={load} style={styles.retryBtn} accessibilityRole="button">
+              <Text style={styles.retryText}>Try again</Text>
+            </Pressable>
+          </View>
+          {yourCurrencies}
+        </ScrollView>
+      )}
+
+      {status === 'ready' && (
+        <FlatList
+          data={filtered}
+          keyExtractor={(item) => item.code}
+          keyboardShouldPersistTaps="handled"
+          initialNumToRender={16}
+          contentContainerStyle={{
+            paddingHorizontal: spacing.lg,
+            paddingBottom: insets.bottom + spacing.xxl,
+          }}
+          ListEmptyComponent={
+            <Text style={styles.empty}>No currencies match your search.</Text>
+          }
+          ListFooterComponent={yourCurrencies}
+          renderItem={({ item }) => {
+            const isBuiltin = BUILTIN_CODES.has(item.code);
+            const isAdded = customCodes.has(item.code);
+            return (
+              <View style={styles.itemRow}>
+                <Text style={styles.itemFlag}>{item.flag}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.itemCode}>
+                    {item.code}
+                    <Text style={styles.itemName}>  {item.name}</Text>
+                  </Text>
+                  <Text style={styles.itemRate}>
+                    1 USD = {formatRate(item.rate)} {item.code}
+                  </Text>
+                </View>
+                {isBuiltin ? (
+                  <Text style={styles.builtin}>Built-in</Text>
+                ) : isAdded ? (
+                  <Text style={styles.added}>✓ Added</Text>
+                ) : (
+                  <Pressable
+                    onPress={() => onAdd(item)}
+                    style={({ pressed }) => [styles.addBtn, pressed && { opacity: 0.85 }]}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Add ${item.name}`}
+                  >
+                    <Text style={styles.addBtnText}>{isPro ? 'Add' : '🔒 Add'}</Text>
+                  </Pressable>
+                )}
+              </View>
+            );
+          }}
+        />
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
-  intro: { color: colors.textDim, fontSize: font.body, lineHeight: 22, marginBottom: spacing.lg },
-  label: {
-    color: colors.textDim,
-    fontSize: font.small,
-    fontWeight: '700',
-    marginBottom: spacing.sm,
-    marginTop: spacing.md,
-  },
-  input: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    color: colors.text,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    fontSize: font.h3,
-    fontWeight: '700',
-  },
-  status: { fontSize: font.small, marginTop: spacing.sm, lineHeight: 19, fontWeight: '600' },
-  row: { flexDirection: 'row', gap: spacing.md },
-  rateWrap: {
+  header: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg },
+  intro: { color: colors.textDim, fontSize: font.body, lineHeight: 23, marginBottom: spacing.md },
+  searchWrap: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
@@ -274,34 +243,96 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: spacing.lg,
   },
-  ratePrefix: { color: colors.textDim, fontSize: font.small, fontWeight: '700' },
-  rateInput: {
+  searchIcon: { fontSize: 16 },
+  searchInput: {
     flex: 1,
     color: colors.text,
+    paddingVertical: spacing.lg,
     fontSize: font.h3,
-    fontWeight: '700',
-    paddingVertical: spacing.md,
-    textAlign: 'right',
+    fontWeight: '600',
   },
-  rateSuffix: { color: colors.textDim, fontSize: font.small, fontWeight: '700', minWidth: 36 },
-  saveBtn: {
-    marginTop: spacing.xl,
+  clear: { color: colors.textDim, fontSize: 20, fontWeight: '700', padding: spacing.xs },
+  updated: {
+    color: colors.textFaint,
+    fontSize: font.small,
+    marginTop: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md },
+  centerText: { color: colors.textDim, fontSize: font.body },
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
+    minHeight: 64,
+  },
+  itemFlag: { fontSize: 28 },
+  itemCode: { color: colors.text, fontSize: font.h3, fontWeight: '800' },
+  itemName: { color: colors.textDim, fontSize: font.body, fontWeight: '500' },
+  itemRate: { color: colors.textFaint, fontSize: font.small, marginTop: 2 },
+  addBtn: {
     backgroundColor: colors.accent,
     borderRadius: radius.pill,
-    paddingVertical: spacing.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    minHeight: 44,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  saveBtnDisabled: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
-  saveText: { color: colors.white, fontWeight: '800', fontSize: font.body },
+  addBtnText: { color: colors.white, fontWeight: '800', fontSize: font.body },
+  added: { color: colors.success, fontWeight: '800', fontSize: font.body },
+  builtin: { color: colors.textFaint, fontWeight: '600', fontSize: font.small },
+  empty: {
+    color: colors.textDim,
+    fontSize: font.body,
+    textAlign: 'center',
+    marginTop: spacing.xl,
+    lineHeight: 23,
+  },
+  offlineCard: {
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.xl,
+    gap: spacing.sm,
+  },
+  offlineIcon: { fontSize: 40 },
+  offlineTitle: { color: colors.text, fontSize: font.h2, fontWeight: '800' },
+  offlineText: {
+    color: colors.textDim,
+    fontSize: font.body,
+    textAlign: 'center',
+    lineHeight: 23,
+  },
+  retryBtn: {
+    marginTop: spacing.md,
+    backgroundColor: colors.accent,
+    borderRadius: radius.pill,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xxl,
+    minHeight: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  retryText: { color: colors.white, fontWeight: '800', fontSize: font.body },
   section: {
     color: colors.textFaint,
     fontSize: font.tiny,
     fontWeight: '800',
     letterSpacing: 1.5,
     textTransform: 'uppercase',
-    marginTop: spacing.xxl,
+    marginTop: spacing.xl,
     marginBottom: spacing.sm,
   },
   customRow: {

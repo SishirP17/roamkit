@@ -124,7 +124,7 @@ export default function CurrencyConverter() {
 
   const onManualRefresh = async () => {
     setRefreshing(true);
-    const fresh = await refreshRates();
+    const fresh = await refreshRates({ force: true });
     if (fresh) setRawTable(fresh);
     setRefreshing(false);
   };

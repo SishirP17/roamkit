@@ -37,7 +37,8 @@ export default function Settings() {
       <Row
         icon="🪙"
         title="Add a currency"
-        sub="Add any currency we don't list yet — like the Nepalese Rupee"
+        sub="Search 160+ world currencies with live rates"
+        badge={!isPro}
         onPress={() => router.push('/add-currency')}
       />
 
@@ -73,7 +74,7 @@ export default function Settings() {
   );
 }
 
-function Row({ icon, title, sub, onPress }) {
+function Row({ icon, title, sub, badge, onPress }) {
   return (
     <Pressable
       onPress={onPress}
@@ -82,7 +83,14 @@ function Row({ icon, title, sub, onPress }) {
     >
       <Text style={styles.rowIcon}>{icon}</Text>
       <View style={{ flex: 1 }}>
-        <Text style={styles.rowTitle}>{title}</Text>
+        <View style={styles.rowTitleWrap}>
+          <Text style={styles.rowTitle}>{title}</Text>
+          {badge && (
+            <View style={styles.proBadge}>
+              <Text style={styles.proText}>🔒 PRO</Text>
+            </View>
+          )}
+        </View>
         <Text style={styles.rowSub}>{sub}</Text>
       </View>
       {onPress && <Text style={styles.chevron}>›</Text>}
@@ -117,7 +125,20 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   rowIcon: { fontSize: 22 },
+  rowTitleWrap: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   rowTitle: { color: colors.text, fontSize: font.body, fontWeight: '700' },
+  proBadge: {
+    backgroundColor: colors.warning,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+  },
+  proText: {
+    color: '#0B1220',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
   rowSub: { color: colors.textFaint, fontSize: font.small, marginTop: 2 },
   chevron: { color: colors.textFaint, fontSize: 24, fontWeight: '700' },
   footer: { color: colors.textFaint, fontSize: font.small, lineHeight: 19, marginTop: spacing.lg },

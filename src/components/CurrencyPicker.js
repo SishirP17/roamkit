@@ -1,15 +1,19 @@
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CURRENCY_META } from '../data/currencyMeta';
 import { useCurrencies } from '../lib/currencies';
+import { usePro } from '../lib/pro';
 import { loadRates, refreshRates } from '../lib/rateStore';
 import { colors, font, radius, spacing } from '../theme';
 
 // Reusable bottom-sheet currency picker used across the money tools.
 export default function CurrencyPicker({ visible, onClose, onSelect, selected, disabled = [] }) {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { currencies, add } = useCurrencies();
+  const { isPro } = usePro();
   const [search, setSearch] = useState('');
   const [adding, setAdding] = useState(false);
   const [addError, setAddError] = useState(null);
@@ -30,6 +34,14 @@ export default function CurrencyPicker({ visible, onClose, onSelect, selected, d
   // network if that code isn't known yet — a failed fetch means we're offline.
   const onAddOnline = async () => {
     if (!canAddOnline || adding) return;
+    // Adding new currencies is a Pro feature. Close the sheet first — this RN
+    // Modal sits above the navigator, so a route pushed while it's open would
+    // appear hidden behind it.
+    if (!isPro) {
+      close();
+      router.push('/pro');
+      return;
+    }
     setAdding(true);
     setAddError(null);
     try {
@@ -51,7 +63,7 @@ export default function CurrencyPicker({ visible, onClose, onSelect, selected, d
         close();
       } else {
         setAddError(
-          `Couldn't find ${candidateCode} online. Connect to Wi-Fi and try again, or add it manually in Settings → Add a currency.`
+          `Couldn't find ${candidateCode} online. Connect to Wi-Fi and try again, or find it in Settings → Add a currency.`
         );
       }
     } catch (e) {
@@ -110,7 +122,7 @@ export default function CurrencyPicker({ visible, onClose, onSelect, selected, d
                         <ActivityIndicator color={colors.white} />
                       ) : (
                         <Text style={styles.addOnlineText}>
-                          {`＋ Add ${candidateCode} from online rates`}
+                          {`${isPro ? '＋' : '🔒'} Add ${candidateCode} from online rates`}
                         </Text>
                       )}
                     </Pressable>

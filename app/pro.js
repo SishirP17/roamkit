@@ -22,6 +22,11 @@ const FEATURES = [
     desc: 'A full offline compass for hiking and camping — find your bearing anywhere.',
   },
   {
+    icon: '🪙',
+    title: 'Full currency catalog',
+    desc: 'Search 160+ world currencies with live exchange rates and add any of them to your tools.',
+  },
+  {
     icon: '✨',
     title: 'Every future Pro tool',
     desc: 'New premium tools are added over time — you get them all, no extra cost.',

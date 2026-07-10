@@ -50,3 +50,6 @@ yarn-error.*
 build/
 *.aab
 *.apk
+
+# Google Cloud service account keys (secrets — never commit)
+roamkit-502021-*.json
