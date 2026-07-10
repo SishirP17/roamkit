@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { parseAmount } from '../src/lib/parseAmount';
 import { colors, font, radius, spacing } from '../src/theme';
 
 // Each category defines units as a factor relative to a base unit.
@@ -94,7 +95,7 @@ export default function UnitConverter() {
   const fromU = cat.units.find((u) => u.code === fromCode) || cat.units[0];
   const toU = cat.units.find((u) => u.code === toCode) || cat.units[1];
 
-  const value = parseFloat(amount.replace(',', '.')) || 0;
+  const value = parseAmount(amount) || 0;
   const result = useMemo(
     () => convertUnits(value, fromU, toU, cat),
     [value, fromU, toU, cat]

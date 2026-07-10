@@ -1,5 +1,6 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Brightness from 'expo-brightness';
+import { useKeepAwake } from 'expo-keep-awake';
 import { useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -23,6 +24,9 @@ function buildSos() {
 const SOS = buildSos();
 
 export default function Flashlight() {
+  // The screen must never sleep here — sleep kills both the screen-light and
+  // (once the app suspends) the LED torch, exactly when someone needs SOS.
+  useKeepAwake();
   const insets = useSafeAreaInsets();
   const [mode, setMode] = useState('off'); // off | on | sos | strobe
   const [flashOn, setFlashOn] = useState(false);
@@ -36,21 +40,32 @@ export default function Flashlight() {
   const screenLit = lightActive && !usingTorch; // white screen only when no LED torch
 
   // Boost screen brightness only when we're using the SCREEN as the light.
+  // Restores whenever the light stops OR the source switches to torch, and a
+  // superseded run must not save/boost brightness after a newer run restored it.
   useEffect(() => {
-    if (isWeb || source !== 'screen') return;
+    if (isWeb) return;
+    let cancelled = false;
+    const wantBright = source === 'screen' && mode !== 'off';
     (async () => {
       try {
-        if (mode !== 'off') {
+        if (wantBright) {
           if (prevBrightness.current == null) {
-            prevBrightness.current = await Brightness.getBrightnessAsync();
+            const current = await Brightness.getBrightnessAsync();
+            if (cancelled) return;
+            prevBrightness.current = current;
           }
+          if (cancelled) return;
           await Brightness.setBrightnessAsync(1);
         } else if (prevBrightness.current != null) {
-          await Brightness.setBrightnessAsync(prevBrightness.current);
+          const restoreTo = prevBrightness.current;
           prevBrightness.current = null;
+          await Brightness.setBrightnessAsync(restoreTo);
         }
       } catch (e) {}
     })();
+    return () => {
+      cancelled = true;
+    };
   }, [mode, source]);
 
   // Restore brightness on unmount.

@@ -1,8 +1,8 @@
 import * as Clipboard from 'expo-clipboard';
 import * as Speech from 'expo-speech';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LANGUAGES, PHRASES } from '../src/data/phrases';
 import { usePro } from '../src/lib/pro';
@@ -35,6 +35,9 @@ export default function Phrasebook() {
     } catch (e) {}
   };
 
+  // Don't keep talking over other screens after the user navigates away.
+  useEffect(() => () => Speech.stop(), []);
+
   const speak = (text) => {
     if (!isPro) {
       // Audio is the Pro upgrade — send them to the paywall.
@@ -43,7 +46,17 @@ export default function Phrasebook() {
     }
     try {
       Speech.stop();
-      Speech.speak(text, { language: SPEAK_LOCALE[lang] || 'en-US', rate: 0.9 });
+      Speech.speak(text, {
+        language: SPEAK_LOCALE[lang] || 'en-US',
+        rate: 0.9,
+        // speak() fails async (e.g. no voice installed for this language on
+        // many Android devices) — without this the paid feature fails silently.
+        onError: () =>
+          Alert.alert(
+            'Voice not available',
+            "Your device doesn't have a voice installed for this language. You can add one in your system's text-to-speech settings."
+          ),
+      });
     } catch (e) {}
   };
 

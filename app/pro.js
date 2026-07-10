@@ -52,7 +52,10 @@ export default function Paywall() {
       }
       setMsg({ text: 'Purchase not completed.', ok: false });
     } catch (e) {
-      setMsg({ text: e?.message || 'Something went wrong. Please try again.', ok: false });
+      // Backing out of the store purchase sheet isn't an error.
+      if (!e?.userCancelled) {
+        setMsg({ text: e?.message || 'Something went wrong. Please try again.', ok: false });
+      }
     } finally {
       setBusy(false);
     }

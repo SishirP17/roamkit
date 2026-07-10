@@ -1,9 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { Platform } from 'react-native';
 import {
   BILLING_ENABLED,
   PRO_ENTITLEMENT_ID,
   REVENUECAT_ANDROID_KEY,
+  REVENUECAT_IOS_KEY,
 } from '../config';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -23,8 +25,11 @@ const STORAGE_KEY = 'pro.entitlement.v1';
 // The Pro price shown on the paywall. Keep in sync with the Play Console product.
 export const PRO_PRICE = '$4.99';
 
-// Whether the app is wired for real payments right now.
-export const isBillingLive = BILLING_ENABLED && !!REVENUECAT_ANDROID_KEY;
+// RevenueCat keys are per-platform: a goog_ key on iOS fails every call.
+const REVENUECAT_KEY = Platform.OS === 'ios' ? REVENUECAT_IOS_KEY : REVENUECAT_ANDROID_KEY;
+
+// Whether the app is wired for real payments right now (on this platform).
+export const isBillingLive = BILLING_ENABLED && !!REVENUECAT_KEY;
 
 // Lazy RevenueCat handle. Configured once, only when billing is live.
 let Purchases = null;
@@ -35,7 +40,7 @@ async function getPurchases() {
     Purchases = require('react-native-purchases').default;
   }
   if (!configured) {
-    await Purchases.configure({ apiKey: REVENUECAT_ANDROID_KEY });
+    await Purchases.configure({ apiKey: REVENUECAT_KEY });
     configured = true;
   }
   return Purchases;

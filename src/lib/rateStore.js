@@ -23,19 +23,20 @@ function normalize(table, source) {
 // Order of preference: in-memory -> cached (last online refresh) -> bundled.
 export async function loadRates() {
   if (memoryCache) return memoryCache;
+  let stored = null;
   try {
     const raw = await AsyncStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed && parsed.rates) {
-        memoryCache = normalize(parsed, 'cache');
-        return memoryCache;
-      }
+      if (parsed && parsed.rates) stored = normalize(parsed, 'cache');
     }
   } catch (e) {
     // ignore corrupt cache, fall through to bundled
   }
-  memoryCache = normalize(BUNDLED_RATES, 'bundled');
+  // A network refresh may have landed while we awaited AsyncStorage; fresher
+  // rates always win over the stored/bundled table.
+  if (memoryCache) return memoryCache;
+  memoryCache = stored || normalize(BUNDLED_RATES, 'bundled');
   return memoryCache;
 }
 

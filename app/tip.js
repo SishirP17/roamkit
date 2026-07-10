@@ -11,6 +11,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CurrencyPicker from '../src/components/CurrencyPicker';
 import { useCurrencies } from '../src/lib/currencies';
+import { parseAmount } from '../src/lib/parseAmount';
 import { colors, font, radius, spacing } from '../src/theme';
 
 const TIP_PRESETS = [10, 15, 18, 20, 25];
@@ -31,23 +32,31 @@ export default function TipSplit() {
   useEffect(() => {
     AsyncStorage.getItem(CUR_KEY).then((v) => v && setCurrency(v)).catch(() => {});
   }, []);
+
+  // Fall back if the saved currency was a custom one that got deleted.
+  useEffect(() => {
+    if (ready && !currencyMap[currency]) setCurrency('USD');
+  }, [ready, currencyMap, currency]);
   const pickCurrency = (code) => {
     setCurrency(code);
     AsyncStorage.setItem(CUR_KEY, code).catch(() => {});
   };
   const sym = currencyMap[currency]?.symbol || '';
 
-  const billNum = parseFloat(bill.replace(',', '.')) || 0;
+  const billNum = parseAmount(bill) || 0;
   const effectiveTip =
-    customTip.trim() !== '' ? parseFloat(customTip.replace(',', '.')) || 0 : tipPct;
+    customTip.trim() !== '' ? parseAmount(customTip) || 0 : tipPct;
 
   const { tipAmount, total, perPerson } = useMemo(() => {
-    const tip = billNum * (effectiveTip / 100);
+    let tip = billNum * (effectiveTip / 100);
     let tot = billNum + tip;
     let per = tot / Math.max(1, people);
     if (roundUp) {
       per = Math.ceil(per);
       tot = per * people;
+      // Fold the round-up into the tip so the rows still add up:
+      // bill + tip === total.
+      tip = tot - billNum;
     }
     return { tipAmount: tip, total: tot, perPerson: per };
   }, [billNum, effectiveTip, people, roundUp]);

@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useMemo, useState } from 'react';
 import {
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CurrencyPicker from '../src/components/CurrencyPicker';
 import LockedNotice from '../src/components/LockedNotice';
 import { useCurrencies } from '../src/lib/currencies';
+import { parseAmount } from '../src/lib/parseAmount';
 import { usePro } from '../src/lib/pro';
 import { convert, loadRates, refreshRates } from '../src/lib/rateStore';
 import { colors, font, radius, spacing } from '../src/theme';
@@ -48,8 +51,13 @@ export default function Budget() {
         const raw = await AsyncStorage.getItem(KEY);
         if (raw && alive) {
           const parsed = JSON.parse(raw);
-          setData({ ...DEFAULT, ...parsed });
-          setExCurrency(parsed.home || 'USD');
+          // A truncated/corrupted store must not brick the screen: expenses
+          // is spread during render, so force it back to an array.
+          if (parsed && typeof parsed === 'object') {
+            if (!Array.isArray(parsed.expenses)) parsed.expenses = [];
+            setData({ ...DEFAULT, ...parsed });
+            setExCurrency(parsed.home || 'USD');
+          }
         }
       } catch (e) {}
       if (alive) setLoaded(true);
@@ -87,7 +95,7 @@ export default function Budget() {
     return { todayTotal: tToday, tripTotal: tAll, grouped: groups };
   }, [data.expenses, data.home, table]);
 
-  const dailyBudgetNum = parseFloat((data.dailyBudget || '').replace(',', '.')) || 0;
+  const dailyBudgetNum = parseAmount(data.dailyBudget) || 0;
   const pct = dailyBudgetNum > 0 ? Math.min(1, todayTotal / dailyBudgetNum) : 0;
   const over = dailyBudgetNum > 0 && todayTotal > dailyBudgetNum;
 
@@ -96,8 +104,8 @@ export default function Budget() {
     (n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const addExpense = () => {
-    const amt = parseFloat(exAmount.replace(',', '.'));
-    if (!amt) return;
+    const amt = parseAmount(exAmount);
+    if (!amt || amt <= 0) return;
     const e = {
       id: `${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
       amount: amt,
@@ -234,7 +242,13 @@ export default function Budget() {
 
       {/* Add expense modal */}
       <Modal visible={addOpen} animationType="slide" transparent onRequestClose={() => setAddOpen(false)}>
-        <View style={styles.backdrop}>
+        {/* On iOS the keyboard slides over a bottom-anchored sheet inside a
+            Modal (no auto-pan like Android), hiding the inputs and Add button. */}
+        <KeyboardAvoidingView
+          style={styles.backdrop}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <Pressable style={{ flex: 1 }} onPress={() => setAddOpen(false)} />
           <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}>
             <View style={styles.sheetHeader}>
               <Text style={styles.sheetTitle}>Add expense</Text>
@@ -271,14 +285,14 @@ export default function Budget() {
             {exAmount ? (
               <Text style={styles.addPreview}>
                 ≈ {homeSym}
-                {fmt(inHome(parseFloat(exAmount.replace(',', '.')) || 0, exCurrency))} in {data.home}
+                {fmt(inHome(parseAmount(exAmount) || 0, exCurrency))} in {data.home}
               </Text>
             ) : null}
             <Pressable onPress={addExpense} style={styles.addBtn}>
               <Text style={styles.addBtnText}>Add expense</Text>
             </Pressable>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       <CurrencyPicker

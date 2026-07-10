@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CURRENCIES } from '../src/data/currencies';
 import { useCurrencies } from '../src/lib/currencies';
+import { parseAmount } from '../src/lib/parseAmount';
 import { loadRates, refreshRates } from '../src/lib/rateStore';
 import { colors, font, radius, spacing } from '../src/theme';
 
@@ -28,6 +29,9 @@ export default function AddCurrency() {
   const [rate, setRate] = useState('');
   const [table, setTable] = useState(null);
   const [savedNote, setSavedNote] = useState(null);
+  const noteTimer = useRef(null);
+
+  useEffect(() => () => clearTimeout(noteTimer.current), []);
 
   // Load the rate table so we can tell the user when a code already has a live
   // rate (so they don't need to type one).
@@ -51,7 +55,7 @@ export default function AddCurrency() {
 
   // A manual rate is only required when nothing else knows this currency.
   const needsRate = cleanCode.length >= 2 && liveRate == null;
-  const rateNum = parseFloat(rate.replace(',', '.'));
+  const rateNum = parseAmount(rate);
   const canSave =
     cleanCode.length >= 2 &&
     cleanCode.length <= 5 &&
@@ -95,7 +99,11 @@ export default function AddCurrency() {
     setSymbol('');
     setFlag('');
     setRate('');
-    setTimeout(() => setSavedNote((n) => (n === `${cleanCode} added` ? null : n)), 1800);
+    clearTimeout(noteTimer.current);
+    noteTimer.current = setTimeout(
+      () => setSavedNote((n) => (n === `${cleanCode} added` ? null : n)),
+      1800
+    );
   };
 
   return (

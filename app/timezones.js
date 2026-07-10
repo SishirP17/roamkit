@@ -32,14 +32,12 @@ function partsFor(date, tz) {
   }).format(date);
 
   // Day difference vs the device's local day (for Today/Tomorrow/Yesterday).
-  const localDay = new Date(date).getDate();
-  const tzDay = parseInt(
-    new Intl.DateTimeFormat('en-US', { timeZone: tz, day: 'numeric' }).format(date),
-    10
-  );
-  let dayDiff = tzDay - localDay;
-  if (dayDiff > 15) dayDiff -= 30;
-  if (dayDiff < -15) dayDiff += 30;
+  // en-CA formats as YYYY-MM-DD, so both days parse as UTC midnight and the
+  // difference is an exact whole number of days across month/year boundaries.
+  const dayOpts = { year: 'numeric', month: '2-digit', day: '2-digit' };
+  const localDate = new Intl.DateTimeFormat('en-CA', dayOpts).format(date);
+  const tzDate = new Intl.DateTimeFormat('en-CA', { timeZone: tz, ...dayOpts }).format(date);
+  const dayDiff = Math.round((Date.parse(tzDate) - Date.parse(localDate)) / 86400000);
   return { time, dateStr, dayDiff };
 }
 

@@ -1,6 +1,6 @@
 import * as Location from 'expo-location';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { daylightLength, getSunTimes } from '../src/lib/sun';
 import { colors, font, radius, spacing } from '../src/theme';
@@ -8,6 +8,7 @@ import { colors, font, radius, spacing } from '../src/theme';
 export default function Sun() {
   const insets = useSafeAreaInsets();
   const [status, setStatus] = useState('loading'); // loading | denied | error | ready
+  const [canAskAgain, setCanAskAgain] = useState(true);
   const [coords, setCoords] = useState(null);
   const [times, setTimes] = useState(null);
 
@@ -16,6 +17,10 @@ export default function Sun() {
     try {
       const perm = await Location.requestForegroundPermissionsAsync();
       if (perm.status !== 'granted') {
+        // After "don't ask again" (Android) / first denial (iOS) the request
+        // resolves instantly with no dialog — retrying is a dead end, the only
+        // way forward is the system settings screen.
+        setCanAskAgain(perm.canAskAgain !== false);
         setStatus('denied');
         return;
       }
@@ -56,11 +61,28 @@ export default function Sun() {
           </Text>
           <Text style={styles.dim}>
             {status === 'denied'
-              ? 'RoamKit needs your location to work out local sunrise and sunset. It stays on your device.'
+              ? canAskAgain
+                ? 'RoamKit needs your location to work out local sunrise and sunset. It stays on your device.'
+                : 'Location is turned off for RoamKit. Allow it in your device settings, then come back and try again.'
               : 'Make sure location is turned on, then try again.'}
           </Text>
-          <Pressable onPress={load} style={styles.btn}>
-            <Text style={styles.btnText}>Try again</Text>
+          {status === 'denied' && !canAskAgain ? (
+            <Pressable onPress={() => Linking.openSettings().catch(() => {})} style={styles.btn}>
+              <Text style={styles.btnText}>Open settings</Text>
+            </Pressable>
+          ) : null}
+          <Pressable
+            onPress={load}
+            style={[styles.btn, status === 'denied' && !canAskAgain && styles.btnGhost]}
+          >
+            <Text
+              style={[
+                styles.btnText,
+                status === 'denied' && !canAskAgain && { color: colors.accent },
+              ]}
+            >
+              Try again
+            </Text>
           </Pressable>
         </View>
       )}
@@ -105,6 +127,7 @@ const styles = StyleSheet.create({
   title: { color: colors.text, fontSize: font.h2, fontWeight: '800' },
   dim: { color: colors.textDim, fontSize: font.body, textAlign: 'center', lineHeight: 22 },
   btn: { marginTop: spacing.md, backgroundColor: colors.accent, borderRadius: radius.pill, paddingVertical: spacing.md, paddingHorizontal: spacing.xl },
+  btnGhost: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.accent },
   btnText: { color: colors.white, fontWeight: '800', fontSize: font.body },
   bigCard: {
     backgroundColor: colors.accentSoft,

@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCurrencies } from '../src/lib/currencies';
+import { parseAmount } from '../src/lib/parseAmount';
 import { convert, loadRates, refreshRates } from '../src/lib/rateStore';
 import { colors, font, radius, spacing } from '../src/theme';
 
@@ -28,7 +29,7 @@ const DEFAULT_TARGETS = ['EUR', 'GBP', 'THB', 'KRW'];
 
 export default function CurrencyConverter() {
   const insets = useSafeAreaInsets();
-  const { currencies, currencyMap, applyRates } = useCurrencies();
+  const { currencies, currencyMap, applyRates, ready } = useCurrencies();
   const [rawTable, setRawTable] = useState(null);
   // Overlay any user-added currencies' manual rates the feed doesn't cover.
   const table = useMemo(() => applyRates(rawTable), [rawTable, applyRates]);
@@ -46,7 +47,8 @@ export default function CurrencyConverter() {
     let alive = true;
     (async () => {
       const initial = await loadRates();
-      if (alive) setRawTable(initial);
+      if (!alive) return;
+      setRawTable(initial);
       setRefreshing(true);
       const fresh = await refreshRates();
       if (alive) {
@@ -86,12 +88,23 @@ export default function CurrencyConverter() {
     AsyncStorage.setItem(PAIR_KEY, JSON.stringify({ from, to })).catch(() => {});
   }, [from, to]);
 
+  // A saved selection can point at a custom currency the user later deleted;
+  // fall back to defaults instead of rendering blank chips and "—" results.
+  useEffect(() => {
+    if (!ready) return;
+    if (!currencyMap[from]) setFrom('USD');
+    if (!currencyMap[to]) setTo('JPY');
+    if (targets.some((t) => !currencyMap[t])) {
+      saveTargets(targets.filter((t) => currencyMap[t]));
+    }
+  }, [ready, currencyMap, from, to, targets]);
+
   const saveTargets = (arr) => {
     setTargets(arr);
     AsyncStorage.setItem(COMPARE_KEY, JSON.stringify(arr)).catch(() => {});
   };
 
-  const numericAmount = parseFloat(amount.replace(',', '.')) || 0;
+  const numericAmount = parseAmount(amount) || 0;
   const result = useMemo(
     () => (table ? convert(numericAmount, from, to, table) : null),
     [numericAmount, from, to, table]

@@ -1,3 +1,4 @@
+import * as Location from 'expo-location';
 import { Magnetometer } from 'expo-sensors';
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -18,7 +19,7 @@ function toHeading(m) {
       : (Math.atan2(y, x) + 2 * Math.PI) * (180 / Math.PI);
   }
   const a = Math.round(angle);
-  return a - 90 >= 0 ? a - 90 : a + 271;
+  return a - 90 >= 0 ? a - 90 : a + 270;
 }
 
 export default function Compass() {
@@ -26,18 +27,53 @@ export default function Compass() {
   const { isPro } = usePro();
   const [heading, setHeading] = useState(0);
   const [supported, setSupported] = useState(null); // null = checking
+  // 0–3 OS calibration score when using fused heading; null on the raw
+  // magnetometer fallback.
+  const [accuracy, setAccuracy] = useState(null);
   const sub = useRef(null);
+  const smooth = useRef(null);
 
   useEffect(() => {
     if (!isPro) return; // don't start the sensor until unlocked
     let alive = true;
     (async () => {
+      // Preferred: the OS's fused compass heading (tilt-compensated, works at
+      // any phone angle). magHeading needs no permission; trueHeading is used
+      // when location permission was already granted elsewhere (it's -1
+      // otherwise). No permission prompt is ever triggered from here.
+      try {
+        const headingSub = await Location.watchHeadingAsync((h) => {
+          if (!alive) return;
+          const deg = h.trueHeading >= 0 ? h.trueHeading : h.magHeading;
+          if (deg >= 0) {
+            setAccuracy(h.accuracy);
+            setHeading(Math.round(deg) % 360);
+          }
+        });
+        if (!alive) {
+          headingSub.remove();
+          return;
+        }
+        sub.current = headingSub;
+        setSupported(true);
+        return;
+      } catch (e) {
+        // No fused heading on this device — fall back to the raw magnetometer.
+      }
       const ok = await Magnetometer.isAvailableAsync().catch(() => false);
       if (!alive) return;
       setSupported(ok);
       if (!ok) return;
       Magnetometer.setUpdateInterval(100);
-      sub.current = Magnetometer.addListener((data) => setHeading(toHeading(data)));
+      sub.current = Magnetometer.addListener((data) => {
+        // Low-pass filter on the raw vector (not the angle, which wraps at
+        // 360°) so the dial doesn't jitter at every 10 Hz sample.
+        const prev = smooth.current;
+        smooth.current = prev
+          ? { x: prev.x * 0.75 + data.x * 0.25, y: prev.y * 0.75 + data.y * 0.25 }
+          : { x: data.x, y: data.y };
+        setHeading(toHeading(smooth.current));
+      });
     })();
     return () => {
       alive = false;
@@ -80,7 +116,11 @@ export default function Compass() {
       </View>
 
       <Text style={styles.hint}>
-        Hold the phone flat. For best accuracy, wave it in a figure-8 to calibrate.
+        {accuracy == null
+          ? 'Hold the phone flat. For best accuracy, wave it in a figure-8 to calibrate.'
+          : accuracy <= 1
+            ? 'Compass needs calibrating — wave your phone in a figure-8.'
+            : 'Keep away from magnets and metal for best accuracy.'}
       </Text>
     </View>
   );

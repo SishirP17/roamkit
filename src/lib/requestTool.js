@@ -1,4 +1,4 @@
-import { Linking, Platform } from 'react-native';
+import { Alert, Linking, Platform } from 'react-native';
 import { ADMIN_EMAIL, APP_NAME, APP_VERSION } from '../config';
 
 // Opens the user's email client with a prefilled "request a tool" message.
@@ -16,6 +16,8 @@ export async function requestTool() {
     await Linking.openURL(url);
     return true;
   } catch (e) {
+    // No email app (common on tablets/fresh devices) — don't fail silently.
+    Alert.alert('No email app found', `Send your idea to ${ADMIN_EMAIL} instead.`);
     return false;
   }
 }

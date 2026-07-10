@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react';
 import { CURRENCIES } from '../data/currencies';
+import { parseAmount } from './parseAmount';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Custom currencies. The built-in list in src/data/currencies.js is a curated
@@ -63,12 +64,15 @@ export function CurrenciesProvider({ children }) {
     (cur) => {
       const code = (cur.code || '').trim().toUpperCase();
       if (!code) return;
+      // Accept "1,5" as well as "1.5"; drop anything non-positive/non-numeric
+      // so a bad manual rate never silently poisons conversions.
+      const manualRate = parseAmount(cur.rate);
       const cleaned = {
         code,
         name: (cur.name || code).trim(),
         symbol: (cur.symbol || code).trim(),
         flag: (cur.flag || '🏳️').trim() || '🏳️',
-        rate: cur.rate ? Number(cur.rate) : null,
+        rate: Number.isFinite(manualRate) && manualRate > 0 ? manualRate : null,
         custom: true,
       };
       const next = [...custom.filter((c) => c.code !== code), cleaned];
