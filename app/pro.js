@@ -1,8 +1,8 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { isBillingLive, PRO_PRICE, usePro } from '../src/lib/pro';
+import { canUnlockPro, isBillingLive, PRO_PRICE, usePro } from '../src/lib/pro';
 import { colors, font, radius, spacing } from '../src/theme';
 
 const FEATURES = [
@@ -106,6 +106,17 @@ export default function Paywall() {
         <View style={styles.ownedCard}>
           <Text style={styles.ownedText}>✓ You have RoamKit Pro</Text>
         </View>
+      ) : !canUnlockPro ? (
+        // Pro cannot be granted here (e.g. the web app). Monetization lives in
+        // the mobile stores, so point people there instead of a dead button.
+        <View style={styles.infoCard}>
+          <Text style={styles.infoTitle}>Available in the mobile app</Text>
+          <Text style={styles.infoBody}>
+            {Platform.OS === 'web'
+              ? 'RoamKit Pro is a one-time purchase in the RoamKit app for Android and iPhone. Everything you see here still works free on the web.'
+              : 'RoamKit Pro is not available in this version yet. It is coming soon.'}
+          </Text>
+        </View>
       ) : (
         <>
           <Pressable
@@ -188,4 +199,16 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   ownedText: { color: colors.success, fontSize: font.h3, fontWeight: '800' },
+  infoCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.accent,
+    padding: spacing.xl,
+    marginTop: spacing.md,
+    alignItems: 'center',
+  },
+  infoTitle: { color: colors.text, fontSize: font.h3, fontWeight: '800', marginBottom: spacing.sm },
+  infoBody: { color: colors.textDim, fontSize: font.body, lineHeight: 23, textAlign: 'center' },
 });
+

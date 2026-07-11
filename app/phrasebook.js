@@ -10,6 +10,7 @@ import { colors, font, radius, spacing } from '../src/theme';
 
 // Maps our language codes to spoken-voice locales (used by expo-speech, offline).
 const SPEAK_LOCALE = {
+  en: 'en-US',
   es: 'es-ES',
   fr: 'fr-FR',
   de: 'de-DE',
@@ -20,12 +21,19 @@ const SPEAK_LOCALE = {
   zh: 'zh-CN',
 };
 
+// Audio for these languages is free for everyone. Every other language keeps
+// tap-to-hear behind Pro. Applies on web, Android and iOS (single codebase).
+const FREE_AUDIO_LANGS = ['en', 'es', 'hi'];
+
 export default function Phrasebook() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { isPro } = usePro();
   const [lang, setLang] = useState('es');
   const [copied, setCopied] = useState(null);
+
+  // Audio is locked only when this language is not free and the user is not Pro.
+  const audioLocked = !isPro && !FREE_AUDIO_LANGS.includes(lang);
 
   const copy = async (text, key) => {
     try {
@@ -39,8 +47,8 @@ export default function Phrasebook() {
   useEffect(() => () => Speech.stop(), []);
 
   const speak = (text) => {
-    if (!isPro) {
-      // Audio is the Pro upgrade — send them to the paywall.
+    if (audioLocked) {
+      // Audio for this language is the Pro upgrade — send them to the paywall.
       router.push('/pro');
       return;
     }
@@ -91,7 +99,8 @@ export default function Phrasebook() {
           <View key={group.category} style={{ marginBottom: spacing.lg }}>
             <Text style={styles.category}>{group.category}</Text>
             {group.items.map((item, i) => {
-              const tr = item[lang];
+              // English is the source text itself; other languages are objects.
+              const tr = lang === 'en' ? { t: item.en } : item[lang];
               const key = `${group.category}-${i}`;
               return (
                 <View key={key} style={styles.card}>
@@ -99,7 +108,9 @@ export default function Phrasebook() {
                     onPress={() => copy(tr.t, key)}
                     style={({ pressed }) => [styles.cardText, pressed && { opacity: 0.7 }]}
                   >
-                    <Text style={styles.en}>{item.en}</Text>
+                    {lang !== 'en' ? (
+                      <Text style={styles.en}>{item.en}</Text>
+                    ) : null}
                     <Text style={styles.translation}>{tr.t}</Text>
                     {tr.p ? <Text style={styles.pron}>{tr.p}</Text> : null}
                     <Text style={styles.copyHint}>
@@ -112,7 +123,7 @@ export default function Phrasebook() {
                     hitSlop={8}
                   >
                     <Text style={styles.speakIcon}>🔊</Text>
-                    {!isPro && <Text style={styles.speakLock}>🔒</Text>}
+                    {audioLocked && <Text style={styles.speakLock}>🔒</Text>}
                   </Pressable>
                 </View>
               );

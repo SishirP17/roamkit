@@ -37,6 +37,13 @@ const REVENUECAT_KEY = Platform.select({
 // Whether the app is wired for real payments right now (on this platform).
 export const isBillingLive = BILLING_ENABLED && !!REVENUECAT_KEY;
 
+// Where Pro can actually be granted: real store billing on a device, or a local
+// test unlock while developing. A PRODUCTION web build (e.g. Vercel) is neither,
+// so Pro cannot be unlocked there. Without this, anyone on the deployed web app
+// could click "Unlock" and get the paid tools free, skipping the mobile billing.
+// __DEV__ is true under `expo start` (localhost) and false in a production build.
+export const canUnlockPro = isBillingLive || __DEV__;
+
 // Lazy RevenueCat handle. Configured once, only when billing is live.
 let Purchases = null;
 let configured = false;
@@ -79,11 +86,16 @@ export function ProProvider({ children }) {
 
   useEffect(() => {
     (async () => {
-      // Fast path: trust the cached flag first so the UI doesn't flicker.
-      try {
-        const raw = await AsyncStorage.getItem(STORAGE_KEY);
-        if (raw === 'true') setIsPro(true);
-      } catch (e) {}
+      // Fast path: trust the cached flag first so the UI doesn't flicker, but
+      // only where Pro can genuinely be granted (real billing, or dev testing).
+      // On a production web build we ignore the cache, so a hand-edited storage
+      // flag cannot silently unlock Pro.
+      if (canUnlockPro) {
+        try {
+          const raw = await AsyncStorage.getItem(STORAGE_KEY);
+          if (raw === 'true') setIsPro(true);
+        } catch (e) {}
+      }
 
       // Authoritative path: ask RevenueCat when billing is live.
       if (isBillingLive) {
@@ -120,10 +132,15 @@ export function ProProvider({ children }) {
           await cache(ok);
           return ok;
         }
-        // Local unlock (testing).
-        setIsPro(true);
-        await cache(true);
-        return true;
+        // Dev-only local unlock so Pro can be tried without the store. Disabled
+        // on production builds (e.g. the Vercel web app), so a user there cannot
+        // grant themselves Pro and bypass the mobile app's billing.
+        if (__DEV__) {
+          setIsPro(true);
+          await cache(true);
+          return true;
+        }
+        return false;
       },
       // Restore a previous purchase on this store account.
       restorePro: async () => {
@@ -139,15 +156,19 @@ export function ProProvider({ children }) {
             return false;
           }
         }
-        // Local restore (testing): whatever we cached.
-        try {
-          const raw = await AsyncStorage.getItem(STORAGE_KEY);
-          const has = raw === 'true';
-          setIsPro(has);
-          return has;
-        } catch (e) {
-          return false;
+        // Dev-only local restore (whatever we cached). Disabled on production
+        // builds so the web app has nothing to "restore" into a free unlock.
+        if (__DEV__) {
+          try {
+            const raw = await AsyncStorage.getItem(STORAGE_KEY);
+            const has = raw === 'true';
+            setIsPro(has);
+            return has;
+          } catch (e) {
+            return false;
+          }
         }
+        return false;
       },
       // Dev helper to re-lock locally (useful while testing the paywall). Does
       // not revoke a real store entitlement — only clears the local cache.

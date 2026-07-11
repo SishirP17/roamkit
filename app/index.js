@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -10,10 +9,11 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import RequestModal from '../src/components/RequestModal';
 import { AFFILIATE } from '../src/data/affiliate';
 import { TOOLS } from '../src/data/tools';
+import { useExternalLink } from '../src/lib/externalLink';
 import { usePro } from '../src/lib/pro';
-import { requestTool } from '../src/lib/requestTool';
 import { colors, font, radius, spacing } from '../src/theme';
 
 export default function Home() {
@@ -21,6 +21,8 @@ export default function Home() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const { isPro } = usePro();
+  const { confirmOpen } = useExternalLink();
+  const [requestOpen, setRequestOpen] = useState(false);
 
   // Responsive grid: 2 columns on phones, more on wide/web screens.
   const maxContentWidth = 640;
@@ -31,19 +33,22 @@ export default function Home() {
   const tileWidth =
     (contentWidth - sidePad * 2 - gutter * (columns - 1)) / columns;
 
-  // Tile order. Currency is always first; Tip & Split is always the last active
-  // tool; "Soon" tools are always dead last. For a FREE user we float the locked
-  // Pro tools up near the top (band 1) to entice the upgrade. For a Pro user
-  // there's nothing to entice, so those tools just fall into the normal band 2.
-  // Sort is stable, so the hand-picked order within each band is preserved.
-  //   0: Currency (always first)   1: Pro tools (free users only, to entice)
-  //   2: everything else           3: Tip & Split   4: "Soon" tools (last)
+  // Tile order, tuned to how the user relates to Pro. A FREE user should not have
+  // paid tools pushed in their face, so those sink to the end (just above "Soon").
+  // A PRO user has already unlocked them, so we reward that by featuring them
+  // first. Currency stays the lead free tool and Tip & Split stays the last of the
+  // normal free tools. Sort is stable, so the hand-picked order within a band is
+  // preserved.
+  //   0: Currency (always first)
+  //   1: Pro tools (Pro users only, featured right after Currency)
+  //   2: everything else        3: Tip & Split
+  //   4: Pro tools (free users, sunk to the end)    5: "Soon" tools (dead last)
   const sortedTools = useMemo(() => {
     const band = (t) => {
-      if (t.status !== 'active') return 4;
+      if (t.status !== 'active') return 5;
       if (t.id === 'currency') return 0;
+      if (t.pro) return isPro ? 1 : 4;
       if (t.id === 'tip') return 3;
-      if (t.pro && !isPro) return 1;
       return 2;
     };
     return [...TOOLS].sort((a, b) => band(a) - band(b));
@@ -117,14 +122,9 @@ export default function Home() {
                     <Text style={styles.proText}>🔒 PRO</Text>
                   </View>
                 )}
-                {/* Free tool with a Pro extra inside (e.g. phrasebook audio).
-                    Uses the same amber 🔒 PRO badge as fully-locked Pro tools. */}
-                {!locked && tool.proHint && !isPro && (
-                  <View style={styles.proBadge}>
-                    <Text style={styles.proText}>🔒 PRO</Text>
-                  </View>
-                )}
-                {isActive && !locked && !(tool.proHint && !isPro) && (
+                {/* Tools with a Pro extra inside (e.g. phrasebook audio) show no
+                    badge here. The Pro prompt appears in-feature when tapped. */}
+                {isActive && !locked && (
                   <View style={[styles.dot, { backgroundColor: tool.color }]} />
                 )}
               </Pressable>
@@ -138,7 +138,9 @@ export default function Home() {
             {AFFILIATE.items.map((it) => (
               <Pressable
                 key={it.id}
-                onPress={() => Linking.openURL(it.url).catch(() => {})}
+                onPress={() =>
+                  confirmOpen(it.url, { title: it.title, message: it.sub })
+                }
                 style={({ pressed }) => [styles.affRow, pressed && { opacity: 0.8 }]}
               >
                 <Text style={styles.affIcon}>{it.icon}</Text>
@@ -158,13 +160,15 @@ export default function Home() {
             The toolkit keeps growing. Request a tool and we may add it.
           </Text>
           <Pressable
-            onPress={requestTool}
+            onPress={() => setRequestOpen(true)}
             style={({ pressed }) => [styles.requestBtn, pressed && { opacity: 0.85 }]}
           >
             <Text style={styles.requestBtnText}>Request a tool</Text>
           </Pressable>
         </View>
       </View>
+
+      <RequestModal visible={requestOpen} onClose={() => setRequestOpen(false)} />
     </ScrollView>
   );
 }

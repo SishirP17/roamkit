@@ -1,13 +1,16 @@
 // Offline travel phrasebook. Each phrase has translations per language code.
 // For non-Latin scripts (Japanese, Hindi, Chinese) a `p` pronunciation is included.
+// English, Spanish and Hindi come first and their audio is free (see
+// FREE_AUDIO_LANGS in app/phrasebook.js). The rest keep tap-to-hear behind Pro.
 export const LANGUAGES = [
+  { code: 'en', name: 'English', flag: '🇬🇧' },
   { code: 'es', name: 'Spanish', flag: '🇪🇸' },
+  { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
   { code: 'fr', name: 'French', flag: '🇫🇷' },
   { code: 'de', name: 'German', flag: '🇩🇪' },
   { code: 'it', name: 'Italian', flag: '🇮🇹' },
   { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
   { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
-  { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
   { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
 ];
 

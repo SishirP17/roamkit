@@ -1,19 +1,23 @@
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
-import { Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import RequestModal from '../src/components/RequestModal';
 import { APP_NAME, APP_VERSION, PRIVACY_URL, TIP_URL } from '../src/config';
+import { useExternalLink } from '../src/lib/externalLink';
 
 // Read the real version from app config so it never drifts out of sync.
 const VERSION = Constants.expoConfig?.version || APP_VERSION;
 import { usePro } from '../src/lib/pro';
-import { requestTool } from '../src/lib/requestTool';
 import { colors, font, radius, spacing } from '../src/theme';
 
 export default function Settings() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { isPro } = usePro();
+  const { confirmOpen } = useExternalLink();
+  const [requestOpen, setRequestOpen] = useState(false);
 
   return (
     <ScrollView
@@ -47,13 +51,18 @@ export default function Settings() {
         icon="☕"
         title="Leave a tip"
         sub="Support development, totally optional"
-        onPress={() => Linking.openURL(TIP_URL).catch(() => {})}
+        onPress={() =>
+          confirmOpen(TIP_URL, {
+            title: 'Support RoamKit',
+            message: 'This opens our tip page in your browser. Thank you for considering it.',
+          })
+        }
       />
       <Row
         icon="✉️"
         title="Request a tool"
         sub="Tell us what to build next"
-        onPress={requestTool}
+        onPress={() => setRequestOpen(true)}
       />
 
       <Text style={styles.section}>About</Text>
@@ -61,7 +70,12 @@ export default function Settings() {
         icon="🔒"
         title="Privacy policy"
         sub="How your data is handled (spoiler: it stays on your device)"
-        onPress={() => Linking.openURL(PRIVACY_URL).catch(() => {})}
+        onPress={() =>
+          confirmOpen(PRIVACY_URL, {
+            title: 'Privacy policy',
+            message: 'This opens our privacy policy in your browser.',
+          })
+        }
       />
       <Row icon="📦" title="Version" sub={VERSION} />
 
@@ -70,6 +84,8 @@ export default function Settings() {
         refresh currency exchange rates. Even then, it keeps the last rates
         saved on your device.
       </Text>
+
+      <RequestModal visible={requestOpen} onClose={() => setRequestOpen(false)} />
     </ScrollView>
   );
 }
