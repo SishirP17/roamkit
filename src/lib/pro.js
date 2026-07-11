@@ -25,8 +25,14 @@ const STORAGE_KEY = 'pro.entitlement.v1';
 // The Pro price shown on the paywall. Keep in sync with the Play Console product.
 export const PRO_PRICE = '$4.99';
 
-// RevenueCat keys are per-platform: a goog_ key on iOS fails every call.
-const REVENUECAT_KEY = Platform.OS === 'ios' ? REVENUECAT_IOS_KEY : REVENUECAT_ANDROID_KEY;
+// RevenueCat keys are per-platform: a goog_ key on iOS fails every call, and
+// web has no store billing at all (empty key keeps billing off there, so the
+// web preview falls back to the local test unlock).
+const REVENUECAT_KEY = Platform.select({
+  android: REVENUECAT_ANDROID_KEY,
+  ios: REVENUECAT_IOS_KEY,
+  default: '',
+});
 
 // Whether the app is wired for real payments right now (on this platform).
 export const isBillingLive = BILLING_ENABLED && !!REVENUECAT_KEY;
