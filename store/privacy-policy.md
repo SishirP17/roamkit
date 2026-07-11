@@ -1,4 +1,4 @@
-# RoamKit — Privacy Policy
+# RoamKit Privacy Policy
 
 _Last updated: 23 June 2026_
 
@@ -27,7 +27,7 @@ one situation:
 
 - **Currency exchange rates.** When you open the Currency tool and you are
   online, the app requests current exchange rates from a third-party rate
-  provider (open.er-api.com). This request contains no personal data — it only
+  provider (open.er-api.com). This request contains no personal data. It only
   asks for the latest rates. If you are offline, the app uses the most recent
   rates already saved on your device.
 
@@ -38,7 +38,7 @@ third-party provider.
 
 If you tap "Request a tool", the app opens your own email application with a
 prefilled message. Sending it is entirely your choice, and the email is handled
-by your email provider — RoamKit does not send anything automatically.
+by your email provider. RoamKit does not send anything automatically.
 
 ## Children's privacy
 

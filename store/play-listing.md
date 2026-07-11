@@ -8,7 +8,7 @@ Copy/paste these into the Play Console "Main store listing" and related forms.
 ```
 RoamKit: Offline Travel Tools
 ```
-(29 chars. Alternative if you want shorter: `RoamKit — Travel Toolkit`)
+(29 chars. Alternative if you want shorter: `RoamKit: Travel Toolkit`)
 
 ## Short description (max 80 chars)
 ```
@@ -18,7 +18,7 @@ Offline currency converter, unit converter, world clock & travel tools. No data.
 
 ## Full description (max 4000 chars)
 ```
-RoamKit is your offline travel toolkit — a set of genuinely useful tools that
+RoamKit is your offline travel toolkit: a set of genuinely useful tools that
 work anywhere in the world, with no internet connection required.
 
 Landed in a new country with no SIM and roaming that costs a fortune? RoamKit
@@ -26,45 +26,45 @@ still works. Everything runs on your device.
 
 ★ WHAT'S INSIDE
 
-• Currency Converter — Convert between 30+ currencies completely offline, and
+• Currency Converter: Convert between 30+ currencies completely offline, and
   compare several at once. Rates are built in and refresh automatically whenever
   you have internet, so you're always up to date. It even tells you how fresh the
   rates are. Add your own currencies too.
 
-• Unit Converter — Length, weight, temperature and volume. Miles to kilometers,
+• Unit Converter: Length, weight, temperature and volume. Miles to kilometers,
   pounds to kilograms, Fahrenheit to Celsius, and more.
 
-• Tip & Split — Work out the tip and split the bill between any number of people
+• Tip & Split: Work out the tip and split the bill between any number of people
   in seconds. Round up per person with one tap.
 
-• World Clock — See the time across the cities that matter to you, all at once.
+• World Clock: See the time across the cities that matter to you, all at once.
   Perfect for staying in sync with home while you travel.
 
-• Phrasebook — Essential travel phrases in Spanish, French, German, Italian,
+• Phrasebook: Essential travel phrases in Spanish, French, German, Italian,
   Portuguese and Japanese, with pronunciation. Tap to copy.
 
-• Sun Times — Offline sunrise and sunset times for wherever you are, calculated
+• Sun Times: Offline sunrise and sunset times for wherever you are, calculated
   on-device. Great for planning hikes and golden-hour photos.
 
-• Survival Guide — Quick offline reference for emergencies on the road.
+• Survival Guide: Quick offline reference for emergencies on the road.
 
-• Flashlight & SOS — Turn your phone into a light, an emergency SOS signal, or a
+• Flashlight & SOS: Turn your phone into a light, an emergency SOS signal, or a
   strobe. Great for camping and emergencies.
 
 ★ ROAMKIT PRO (optional one-time purchase)
 
-Unlock the Pro tools with a single purchase — no subscription:
+Unlock the Pro tools with a single purchase, no subscription:
 
-• Trip Budget & Expenses — Track spending abroad, log expenses in any currency,
+• Trip Budget & Expenses: Track spending abroad, log expenses in any currency,
   and see your daily and trip totals converted to your home currency.
 
-• Spoken Phrasebook — Hear travel phrases spoken aloud.
+• Spoken Phrasebook: Hear travel phrases spoken aloud.
 
-• Compass — A simple offline compass for finding your way.
+• Compass: A simple offline compass for finding your way.
 
 ★ WHY ROAMKIT
 
-• Works 100% offline — no connection needed
+• Works 100% offline, no connection needed
 • No account, no sign-up
 • No ads, no tracking, no analytics
 • Clean, simple, fast
@@ -73,7 +73,7 @@ Unlock the Pro tools with a single purchase — no subscription:
 ★ ALWAYS GROWING
 
 RoamKit is a toolkit that keeps expanding. Got an idea for a tool you'd love to
-have? Tap "Request a tool" right inside the app and tell us — new tools are
+have? Tap "Request a tool" right inside the app and tell us. New tools are
 added over time.
 
 Pack light. Roam far. Stay offline.

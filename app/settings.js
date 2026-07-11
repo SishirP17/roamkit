@@ -46,7 +46,7 @@ export default function Settings() {
       <Row
         icon="☕"
         title="Leave a tip"
-        sub="Support development — totally optional"
+        sub="Support development, totally optional"
         onPress={() => Linking.openURL(TIP_URL).catch(() => {})}
       />
       <Row
@@ -67,7 +67,7 @@ export default function Settings() {
 
       <Text style={styles.footer}>
         RoamKit works fully offline. The only time it uses the internet is to
-        refresh currency exchange rates — and even then, it keeps the last rates
+        refresh currency exchange rates. Even then, it keeps the last rates
         saved on your device.
       </Text>
     </ScrollView>

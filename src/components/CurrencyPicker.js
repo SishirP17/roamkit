@@ -130,7 +130,7 @@ export default function CurrencyPicker({ visible, onClose, onSelect, selected, d
                       <Text style={styles.addError}>{addError}</Text>
                     ) : (
                       <Text style={styles.emptyHint}>
-                        Needs Wi-Fi the first time — then it's saved on your phone.
+                        Needs Wi-Fi the first time. After that it's saved on your phone.
                       </Text>
                     )}
                   </>

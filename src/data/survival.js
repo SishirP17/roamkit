@@ -20,12 +20,12 @@ export const SURVIVAL = [
       {
         sub: 'Order of action',
         steps: [
-          'Stop and stay calm — panic kills. Sit, breathe, think.',
+          'Stop and stay calm. Panic kills. Sit, breathe, think.',
           'Treat any life-threatening injuries first.',
           'Get protection from the weather (shelter, warmth).',
           'Signal for rescue and make yourself visible.',
           'Find clean water, then worry about food.',
-          'If unsure, STAY PUT — moving makes you harder to find.',
+          'If unsure, STAY PUT. Moving makes you harder to find.',
         ],
       },
     ],
@@ -39,7 +39,7 @@ export const SURVIVAL = [
         sub: 'Severe bleeding',
         steps: [
           'Press hard directly on the wound with a cloth or your hand.',
-          'Keep pressing — do not lift to peek. Add cloth on top if it soaks through.',
+          'Keep pressing, do not lift to peek. Add cloth on top if it soaks through.',
           'Raise the injured part above the heart if you can.',
           'Only use a tourniquet for life-threatening limb bleeding; note the time.',
         ],
@@ -146,7 +146,7 @@ export const SURVIVAL = [
       {
         sub: 'Build it in stages',
         steps: [
-          'Tinder: dry grass, bark, lint — catches a spark.',
+          'Tinder catches the spark: dry grass, bark, or lint.',
           'Kindling: pencil-thin dry twigs.',
           'Fuel: thumb-thick and larger, added gradually.',
           'Shape a teepee or log-cabin; light the tinder, protect from wind.',
@@ -163,7 +163,7 @@ export const SURVIVAL = [
       {
         sub: 'Stay protected',
         steps: [
-          'Insulate from the GROUND first — it steals heat fast.',
+          'Insulate from the GROUND first. It steals heat fast.',
           'Pick high, dry ground; avoid valley bottoms (cold) and lone trees (lightning).',
           'Small shelters trap body heat better than large ones.',
           'Use natural cover: rock overhangs, fallen trees, dense evergreens.',
@@ -180,8 +180,8 @@ export const SURVIVAL = [
         sub: 'Universal distress',
         steps: [
           'Three of anything = distress: 3 whistle blasts, 3 fires, 3 flashes.',
-          'SOS in Morse: ··· ——— ··· (short-short-short, long-long-long, short-short-short).',
-          'A whistle carries far further than your voice — conserve energy.',
+          'SOS in Morse: ··· --- ··· (short-short-short, long-long-long, short-short-short).',
+          'A whistle carries far further than your voice. Conserve energy.',
           'A mirror/phone screen flash can be seen for miles in sunlight.',
         ],
       },
@@ -205,9 +205,9 @@ export const SURVIVAL = [
         sub: 'Without a compass or GPS',
         steps: [
           'Sun rises roughly east, sets roughly west.',
-          'Northern hemisphere: find Polaris (North Star) off the Big Dipper — that way is north.',
+          'Northern hemisphere: find Polaris (North Star) off the Big Dipper. That way is north.',
           'Southern hemisphere: use the Southern Cross to find south.',
-          'Stick shadow: mark the shadow tip, wait 15 min, mark again — first mark is west.',
+          'Stick shadow: mark the shadow tip, wait 15 min, mark again. The first mark is west.',
         ],
       },
     ],
@@ -220,10 +220,10 @@ export const SURVIVAL = [
       {
         sub: 'Safety first',
         steps: [
-          'When in doubt, do NOT eat it — a wrong plant or mushroom can kill.',
+          'When in doubt, do NOT eat it. A wrong plant or mushroom can kill.',
           'Avoid mushrooms entirely unless you are 100% certain.',
           'Avoid plants with milky sap, bitter taste, or umbrella-shaped flower clusters.',
-          'You can survive weeks without food — never risk poisoning for a meal.',
+          'You can survive weeks without food. Never risk poisoning for a meal.',
         ],
       },
     ],

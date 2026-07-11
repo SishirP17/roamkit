@@ -70,7 +70,7 @@ export default function Home() {
         </View>
         <Text style={styles.title}>Travel tools{'\n'}that work offline.</Text>
         <Text style={styles.subtitle}>
-          Everything you need on the road — no internet required, anywhere in the world.
+          Everything you need on the road. No internet required, anywhere in the world.
         </Text>
 
         <View style={[styles.grid, { marginTop: spacing.xl }]}>

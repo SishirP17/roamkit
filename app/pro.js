@@ -14,12 +14,12 @@ const FEATURES = [
   {
     icon: '🔊',
     title: 'Hear any phrase spoken',
-    desc: 'Tap to hear phrasebook phrases pronounced out loud in the local language — works offline.',
+    desc: 'Tap to hear phrasebook phrases pronounced out loud in the local language. Works offline.',
   },
   {
     icon: '🧭',
     title: 'Compass',
-    desc: 'A full offline compass for hiking and camping — find your bearing anywhere.',
+    desc: 'A full offline compass for hiking and camping. Find your bearing anywhere.',
   },
   {
     icon: '🪙',
@@ -29,7 +29,7 @@ const FEATURES = [
   {
     icon: '✨',
     title: 'Every future Pro tool',
-    desc: 'New premium tools are added over time — you get them all, no extra cost.',
+    desc: 'New premium tools are added over time. You get them all, no extra cost.',
   },
   {
     icon: '🚫',

@@ -21,6 +21,9 @@ Single codebase ships to App Store, Play Store, and web.
 ## Conventions
 - Dark navy theme, one accent blue. Tiles each get a color from `tileColors`.
 - Keep new tools self-contained as a single screen file where possible.
+- **Never use em dashes (—) in user-facing text** (screen copy, data content,
+  store listing, release notes). Use a comma, period, or colon, or restructure
+  the sentence. Code comments are exempt.
 
 ## Run / verify
 - `npm run web` to run; `npx expo export --platform web` to check it compiles.

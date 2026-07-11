@@ -119,7 +119,7 @@ export default function Compass() {
         {accuracy == null
           ? 'Hold the phone flat. For best accuracy, wave it in a figure-8 to calibrate.'
           : accuracy <= 1
-            ? 'Compass needs calibrating — wave your phone in a figure-8.'
+            ? 'Compass needs calibrating. Wave your phone in a figure-8.'
             : 'Keep away from magnets and metal for best accuracy.'}
       </Text>
     </View>

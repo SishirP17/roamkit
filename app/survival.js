@@ -53,7 +53,7 @@ export default function Survival() {
         );
       })}
 
-      <Text style={styles.footer}>Works fully offline — keep it handy out there.</Text>
+      <Text style={styles.footer}>Works fully offline. Keep it handy out there.</Text>
     </ScrollView>
   );
 }
