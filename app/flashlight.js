@@ -141,6 +141,22 @@ export default function Flashlight() {
         <Pressable style={StyleSheet.absoluteFill} onPress={() => setMode('off')} />
       )}
 
+      {/* Idle: a big thumb-friendly power button fills the dark area above the
+          mode row. While a mode runs this space is the light / tap-to-off surface. */}
+      {mode === 'off' && (
+        <View style={styles.hero} pointerEvents="box-none">
+          <Pressable
+            onPress={() => setModeSafe('on')}
+            accessibilityRole="button"
+            accessibilityLabel="Turn the light on"
+            style={({ pressed }) => [styles.powerBtn, pressed && styles.powerBtnPressed]}
+          >
+            <Text style={styles.powerIcon}>🔦</Text>
+            <Text style={styles.powerLabel}>Turn on</Text>
+          </Pressable>
+        </View>
+      )}
+
       <View
         style={[
           styles.controls,
@@ -196,6 +212,21 @@ function ModeButton({ label, icon, active, onPress, lit }) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg, justifyContent: 'flex-end' },
   screenLit: { backgroundColor: '#FFFFFF' },
+  hero: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  powerBtn: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: spacing.xs,
+  },
+  powerBtnPressed: { backgroundColor: colors.surfaceAlt, opacity: 0.9 },
+  powerIcon: { fontSize: 52 },
+  powerLabel: { color: colors.textDim, fontWeight: '700', fontSize: font.small },
   hiddenCam: { position: 'absolute', width: 1, height: 1, top: 0, left: 0, opacity: 0 },
   controls: { paddingHorizontal: spacing.lg, alignItems: 'center', gap: spacing.lg },
   title: { color: colors.textDim, fontSize: font.body, fontWeight: '600' },

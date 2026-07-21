@@ -102,11 +102,14 @@ export default function WorldClock() {
               <Text style={styles.flag}>{item.flag}</Text>
               <View style={{ flex: 1 }}>
                 <Text style={styles.city}>{item.name}</Text>
-                <Text style={styles.sub}>
-                  {dateStr} · {dayLabel(dayDiff)}
-                </Text>
+                <Text style={styles.sub}>{dateStr}</Text>
               </View>
-              <Text style={styles.time}>{time}</Text>
+              {/* Day shift lives under the time: it explains the time, and the
+                  date line can no longer wrap when the time is wide (12:10 AM). */}
+              <View style={styles.timeWrap}>
+                <Text style={styles.time}>{time}</Text>
+                <Text style={styles.sub}>{dayLabel(dayDiff)}</Text>
+              </View>
               <Pressable onPress={() => removeCity(item.id)} hitSlop={10} style={styles.remove}>
                 <Text style={styles.removeText}>✕</Text>
               </Pressable>
@@ -178,6 +181,7 @@ const styles = StyleSheet.create({
   flag: { fontSize: 30 },
   city: { color: colors.text, fontSize: font.h3, fontWeight: '700' },
   sub: { color: colors.textFaint, fontSize: font.small, marginTop: 2 },
+  timeWrap: { alignItems: 'flex-end' },
   time: { color: colors.text, fontSize: font.h2, fontWeight: '800', fontVariant: ['tabular-nums'] },
   remove: { paddingLeft: spacing.sm },
   removeText: { color: colors.textFaint, fontSize: 16 },

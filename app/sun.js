@@ -5,6 +5,22 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { daylightLength, getSunTimes } from '../src/lib/sun';
 import { colors, font, radius, spacing } from '../src/theme';
 
+// Short label for the zone the times are formatted in ("GMT+5:45", "EDT").
+// Times follow the DEVICE time zone, which matches the location for anyone
+// whose phone auto-updates while traveling, but saying so avoids confusion
+// when it doesn't (manual zone, fresh off a flight).
+function deviceZoneLabel() {
+  try {
+    return (
+      new Intl.DateTimeFormat(undefined, { timeZoneName: 'short' })
+        .formatToParts(new Date())
+        .find((p) => p.type === 'timeZoneName')?.value || null
+    );
+  } catch (e) {
+    return null;
+  }
+}
+
 export default function Sun() {
   const insets = useSafeAreaInsets();
   const [status, setStatus] = useState('loading'); // loading | denied | error | ready
@@ -40,6 +56,7 @@ export default function Sun() {
 
   const fmtTime = (d) =>
     d ? d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '–';
+  const deviceZone = deviceZoneLabel();
 
   return (
     <ScrollView
@@ -102,7 +119,9 @@ export default function Sun() {
           </View>
 
           <Text style={styles.footer}>
-            For your current location, today. Works fully offline.
+            For your current location, today.
+            {deviceZone ? ` Times are in your device's time zone (${deviceZone}).` : ''}
+            {' '}Works fully offline.
           </Text>
         </>
       )}
