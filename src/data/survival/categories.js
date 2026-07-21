@@ -92,6 +92,9 @@ export const CATEGORIES = [
   },
 ];
 
-export const CATEGORY_BY_ID = Object.fromEntries(
-  CATEGORIES.map((c) => [c.id, c])
+// Null-prototype: looked up with raw route params, and a plain object would
+// return Object.prototype members for ids like "constructor".
+export const CATEGORY_BY_ID = Object.assign(
+  Object.create(null),
+  Object.fromEntries(CATEGORIES.map((c) => [c.id, c]))
 );

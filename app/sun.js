@@ -39,7 +39,7 @@ export default function Sun() {
   }, []);
 
   const fmtTime = (d) =>
-    d ? d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '—';
+    d ? d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '–';
 
   return (
     <ScrollView
@@ -96,7 +96,7 @@ export default function Sun() {
           </View>
 
           <View style={styles.card}>
-            <Row icon="🌣" label="Daylight" value={daylightLength(times.sunrise, times.sunset) || '—'} />
+            <Row icon="🌣" label="Daylight" value={daylightLength(times.sunrise, times.sunset) || '–'} />
             <Row icon="🌄" label="First light (dawn)" value={fmtTime(times.dawn)} />
             <Row icon="🌃" label="Last light (dusk)" value={fmtTime(times.dusk)} />
           </View>

@@ -110,7 +110,7 @@ export default function UnitConverter() {
   const fmt = (n) =>
     Number.isFinite(n)
       ? n.toLocaleString(undefined, { maximumFractionDigits: 6 })
-      : '—';
+      : '–';
 
   return (
     <ScrollView

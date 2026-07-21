@@ -1,5 +1,6 @@
+import { useFocusEffect } from 'expo-router';
 import * as Speech from 'expo-speech';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text } from 'react-native';
 import { colors, font, radius, spacing } from '../../theme';
 
@@ -9,8 +10,20 @@ import { colors, font, radius, spacing } from '../../theme';
 export default function ReadAloudButton({ text }) {
   const [speaking, setSpeaking] = useState(false);
 
-  // Never keep talking after the user leaves the screen.
-  useEffect(() => () => Speech.stop(), []);
+  // Never keep talking after the user leaves the screen. Focus (not unmount)
+  // is the right signal: pushing a "See also" article keeps this screen
+  // mounted underneath, so an unmount cleanup would keep narrating over it.
+  useFocusEffect(
+    useCallback(
+      () => () => {
+        try {
+          Speech.stop();
+        } catch (e) {}
+        setSpeaking(false);
+      },
+      []
+    )
+  );
 
   const stop = () => {
     try {

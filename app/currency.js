@@ -151,7 +151,7 @@ export default function CurrencyConverter() {
 
   const fmt = (n) =>
     n == null
-      ? '—'
+      ? '–'
       : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (

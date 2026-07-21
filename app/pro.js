@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { canUnlockPro, isBillingLive, PRO_PRICE, usePro } from '../src/lib/pro';
+import { canUnlockPro, isBillingLive, usePro } from '../src/lib/pro';
 import { colors, font, radius, spacing } from '../src/theme';
 
 const FEATURES = [
@@ -41,7 +41,7 @@ const FEATURES = [
 export default function Paywall() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { isPro, unlockPro, restorePro } = usePro();
+  const { isPro, unlockPro, restorePro, proPrice } = usePro();
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState(null); // { text, ok }
 
@@ -55,7 +55,15 @@ export default function Paywall() {
         router.back();
         return;
       }
-      setMsg({ text: 'Purchase not completed.', ok: false });
+      // On a live store, unlockPro only returns false when the purchase went
+      // through but the entitlement did not activate. Never tell someone who
+      // just paid that nothing happened.
+      setMsg({
+        text: isBillingLive
+          ? 'Your payment went through but Pro has not activated yet. Tap "Restore purchase" in a moment. If it still does not unlock, contact support and we will fix it.'
+          : 'Purchase not completed.',
+        ok: false,
+      });
     } catch (e) {
       // Backing out of the store purchase sheet isn't an error.
       if (!e?.userCancelled) {
@@ -68,13 +76,24 @@ export default function Paywall() {
 
   const onRestore = async () => {
     setBusy(true);
-    const ok = await restorePro();
-    setBusy(false);
-    setMsg(
-      ok
-        ? { text: 'Purchase restored ✓', ok: true }
-        : { text: 'No previous purchase found.', ok: false }
-    );
+    setMsg(null);
+    try {
+      const ok = await restorePro();
+      setMsg(
+        ok
+          ? { text: 'Purchase restored ✓', ok: true }
+          : { text: 'No previous purchase found on this Google account.', ok: false }
+      );
+    } catch (e) {
+      // Store unreachable is NOT "no purchase". Say so, so a paying user on
+      // hotel Wi-Fi does not think their purchase is gone.
+      setMsg({
+        text: 'Could not reach the store. Check your connection and try again.',
+        ok: false,
+      });
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -124,7 +143,7 @@ export default function Paywall() {
             disabled={busy}
             style={({ pressed }) => [styles.cta, pressed && { opacity: 0.9 }]}
           >
-            <Text style={styles.ctaText}>Unlock Pro · {PRO_PRICE}</Text>
+            <Text style={styles.ctaText}>Unlock Pro · {proPrice}</Text>
           </Pressable>
           <Pressable onPress={onRestore} disabled={busy} style={styles.restore}>
             <Text style={styles.restoreText}>Restore purchase</Text>

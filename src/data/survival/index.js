@@ -19,7 +19,9 @@ import food from './articles/food';
 export { CATEGORIES, CATEGORY_BY_ID };
 
 // Category id -> article[] (kept in category order via CATEGORIES).
-const GROUPS = {
+// Null-prototype: these are looked up with raw route params, and a plain object
+// would return Object.prototype members for ids like "constructor".
+const GROUPS = Object.assign(Object.create(null), {
   priorities,
   'first-aid': firstAid,
   'cold-heat': coldHeat,
@@ -31,15 +33,16 @@ const GROUPS = {
   signalling,
   'animals-plants': animalsPlants,
   food,
-};
+});
 
 export const ARTICLES_BY_CATEGORY = GROUPS;
 
 // Flat list, in category order.
 export const ARTICLES = CATEGORIES.flatMap((c) => GROUPS[c.id] || []);
 
-export const ARTICLE_BY_ID = Object.fromEntries(
-  ARTICLES.map((a) => [a.id, a])
+export const ARTICLE_BY_ID = Object.assign(
+  Object.create(null),
+  Object.fromEntries(ARTICLES.map((a) => [a.id, a]))
 );
 
 // Life-critical shortcuts for the red "In an emergency" row (most severe first).
@@ -74,7 +77,7 @@ const SEARCH_INDEX = ARTICLES.map((a) => ({
 const STOP_WORDS = new Set([
   'i', 'im', 'ive', 'a', 'an', 'the', 'my', 'me', 'is', 'am', 'are', 'be',
   'was', 'have', 'has', 'to', 'of', 'in', 'on', 'at', 'by', 'for', 'from',
-  'into', 'out', 'up', 'and', 'or', 'if', 'so', 'help', 'how', 'do', 'can',
+  'into', 'out', 'up', 'and', 'or', 'if', 'so', 'how', 'do', 'can',
   'what', 'with', 'someone', 'somebody', 'they', 'he', 'she', 'it', 'got',
   'get', 'need', 'about',
 ]);

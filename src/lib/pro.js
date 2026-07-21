@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 import {
   BILLING_ENABLED,
   PRO_ENTITLEMENT_ID,
+  PRO_PRODUCT_ID,
   REVENUECAT_ANDROID_KEY,
   REVENUECAT_IOS_KEY,
 } from '../config';
@@ -22,7 +23,8 @@ import {
 
 const STORAGE_KEY = 'pro.entitlement.v1';
 
-// The Pro price shown on the paywall. Keep in sync with the Play Console product.
+// Fallback paywall price, shown until the store's localized price is fetched
+// (and on dev/local builds where there is no store).
 export const PRO_PRICE = '$4.99';
 
 // RevenueCat keys are per-platform: a goog_ key on iOS fails every call, and
@@ -63,9 +65,25 @@ function hasProEntitlement(customerInfo) {
   return !!customerInfo?.entitlements?.active?.[PRO_ENTITLEMENT_ID];
 }
 
+// The one package the buy button may charge for, matched by store product id so
+// a RevenueCat dashboard edit (extra package, changed "current" offering) can
+// never silently change what the user is billed. Play subscription-style ids
+// ("roamkit_pro:plan") are tolerated; the product is a one-time purchase.
+function findProPackage(offerings) {
+  const all = [
+    ...(offerings?.current?.availablePackages || []),
+    ...Object.values(offerings?.all || {}).flatMap((o) => o?.availablePackages || []),
+  ];
+  return all.find((p) => {
+    const id = p?.product?.identifier;
+    return id === PRO_PRODUCT_ID || (id && id.startsWith(PRO_PRODUCT_ID + ':'));
+  });
+}
+
 const ProContext = createContext({
   isPro: false,
   ready: false,
+  proPrice: PRO_PRICE,
   unlockPro: async () => false,
   restorePro: async () => false,
   resetPro: async () => {},
@@ -74,6 +92,10 @@ const ProContext = createContext({
 export function ProProvider({ children }) {
   const [isPro, setIsPro] = useState(false);
   const [ready, setReady] = useState(false);
+  // The store's localized price for the paywall (e.g. "₹399.00"), so what we
+  // advertise matches what Google actually charges. Falls back to PRO_PRICE
+  // until fetched (or offline).
+  const [proPrice, setProPrice] = useState(PRO_PRICE);
 
   // Mirror the entitlement to AsyncStorage so it's available instantly and
   // offline on the next launch (and as the only source of truth in local mode).
@@ -108,6 +130,14 @@ export function ProProvider({ children }) {
         } catch (e) {
           // Offline or RC unreachable — keep the cached value.
         }
+        try {
+          const P = await getPurchases();
+          const pkg = findProPackage(await P.getOfferings());
+          const localized = pkg?.product?.priceString;
+          if (localized) setProPrice(localized);
+        } catch (e) {
+          // Offline — keep the fallback price.
+        }
       }
       setReady(true);
     })();
@@ -117,15 +147,17 @@ export function ProProvider({ children }) {
     () => ({
       isPro,
       ready,
+      proPrice,
       // Buy Pro. Returns true if the entitlement is now active.
       unlockPro: async () => {
         if (isBillingLive) {
           const P = await getPurchases();
-          const offerings = await P.getOfferings();
-          const pkg =
-            offerings.current?.availablePackages?.[0] ||
-            Object.values(offerings.all || {})[0]?.availablePackages?.[0];
-          if (!pkg) throw new Error('No Pro package is available to purchase.');
+          const pkg = findProPackage(await P.getOfferings());
+          if (!pkg) {
+            throw new Error(
+              'The Pro purchase is not available right now. Please try again later.'
+            );
+          }
           const { customerInfo } = await P.purchasePackage(pkg);
           const ok = hasProEntitlement(customerInfo);
           setIsPro(ok);
@@ -142,19 +174,18 @@ export function ProProvider({ children }) {
         }
         return false;
       },
-      // Restore a previous purchase on this store account.
+      // Restore a previous purchase on this store account. Returns true/false
+      // for entitlement found / genuinely absent; THROWS when the store could
+      // not be reached, so the paywall can say "try again" instead of telling
+      // a paying user their purchase does not exist.
       restorePro: async () => {
         if (isBillingLive) {
-          try {
-            const P = await getPurchases();
-            const info = await P.restorePurchases();
-            const ok = hasProEntitlement(info);
-            setIsPro(ok);
-            await cache(ok);
-            return ok;
-          } catch (e) {
-            return false;
-          }
+          const P = await getPurchases();
+          const info = await P.restorePurchases();
+          const ok = hasProEntitlement(info);
+          setIsPro(ok);
+          await cache(ok);
+          return ok;
         }
         // Dev-only local restore (whatever we cached). Disabled on production
         // builds so the web app has nothing to "restore" into a free unlock.
@@ -177,7 +208,7 @@ export function ProProvider({ children }) {
         await cache(false);
       },
     }),
-    [isPro, ready]
+    [isPro, ready, proPrice]
   );
 
   return <ProContext.Provider value={value}>{children}</ProContext.Provider>;
