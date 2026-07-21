@@ -19,7 +19,7 @@ const CUR_KEY = 'tip.currency.v1';
 
 export default function TipSplit() {
   const insets = useSafeAreaInsets();
-  const { currencyMap } = useCurrencies();
+  const { currencyMap, ready } = useCurrencies();
   const [bill, setBill] = useState('');
   const [tipPct, setTipPct] = useState(15);
   const [customTip, setCustomTip] = useState('');
