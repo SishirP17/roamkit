@@ -172,7 +172,7 @@ export default function CurrencyConverter() {
       </View>
 
       {mode === 'convert' ? (
-        <View style={styles.body}>
+        <View style={[styles.body, styles.fill]}>
           <View style={styles.card}>
             <CurrencyRow label="Amount" currency={currencyMap[from]} onPressCurrency={() => setPickerFor('from')}>
               <TextInput
@@ -210,7 +210,7 @@ export default function CurrencyConverter() {
           )}
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.body}>
+        <ScrollView style={styles.fill} contentContainerStyle={styles.body}>
           {/* Base amount */}
           <View style={styles.card}>
             <CurrencyRow label="Amount" currency={currencyMap[from]} onPressCurrency={() => setPickerFor('from')}>
@@ -339,7 +339,8 @@ function CurrencyRow({ label, currency, onPressCurrency, children }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg, justifyContent: 'space-between' },
+  screen: { flex: 1, backgroundColor: colors.bg },
+  fill: { flex: 1 },
   tabs: {
     flexDirection: 'row',
     backgroundColor: colors.surface,
