@@ -80,6 +80,45 @@ tool" inside the app and tell us. The best ideas become new tools.
 Pack light. Roam far. Stay offline.
 ```
 
+## Promo video (YouTube)
+
+Upload `RoamKit-promo.mp4` (1920x1080, ~34s, silent) to YouTube as Public or
+Unlisted with monetization off, then paste the YouTube URL into Play Console's
+"Video" field on the Main store listing.
+
+### Title (max 100 chars)
+```
+RoamKit: Offline Travel Tools for Android | Currency, Phrasebook, SOS Light & More
+```
+
+### Description
+```
+RoamKit is the travel toolkit that works when nothing else does. Every tool runs entirely on your phone: no internet, no SIM card, no roaming charges.
+
+Get it on Google Play: https://play.google.com/store/apps/details?id=com.roamkit.app
+
+WHAT'S INSIDE
+• Currency Converter: 30+ currencies, fully offline, with live rates when you're online
+• Unit Converter: length, weight, temperature and volume
+• Flashlight & SOS: bright light, SOS signal and strobe, one tap away
+• Tip & Split: tip and bill splitting in seconds
+• World Clock: every time zone that matters to you on one screen
+• Phrasebook: essential phrases in 6 languages with pronunciation
+• Sun Times: sunrise and sunset for wherever you are
+• Survival Guide: first aid and outdoor emergency know-how
+
+ROAMKIT PRO (one purchase, no subscription)
+• Trip Budget: track spending abroad in any currency
+• Spoken Phrasebook: hear every phrase out loud
+• Compass: find your bearing anywhere
+
+No account. No ads. No tracking. Everything stays on your device.
+
+Pack light. Roam far. Stay offline.
+
+#travel #android #offlineapps #travelapp #backpacking #digitalnomad
+```
+
 ## Category
 - Category: **Travel & Local** (alternative: Tools)
 - Tags: travel, currency converter, offline, unit converter, world clock
