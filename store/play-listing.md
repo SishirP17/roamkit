@@ -1,4 +1,4 @@
-# RoamKit — Google Play Store Listing
+# RoamKit: Google Play Store Listing
 
 Copy/paste these into the Play Console "Main store listing" and related forms.
 
@@ -12,69 +12,70 @@ RoamKit: Offline Travel Tools
 
 ## Short description (max 80 chars)
 ```
-Offline currency converter, unit converter, world clock & travel tools. No data.
+Offline travel tools: currency, phrasebook, world clock, SOS light and more.
 ```
-(79 chars)
+(76 chars)
 
 ## Full description (max 4000 chars)
 ```
-RoamKit is your offline travel toolkit: a set of genuinely useful tools that
-work anywhere in the world, with no internet connection required.
+RoamKit is the travel toolkit that works when nothing else does. Every tool
+runs entirely on your phone, so you get answers instantly: no internet, no SIM
+card, no roaming charges.
 
-Landed in a new country with no SIM and roaming that costs a fortune? RoamKit
-still works. Everything runs on your device.
+New country, no data? Airplane mode? Halfway up a mountain? RoamKit works
+exactly the same.
 
 ★ WHAT'S INSIDE
 
-• Currency Converter: Convert between 30+ currencies completely offline, and
-  compare several at once. Rates are built in and refresh automatically whenever
-  you have internet, so you're always up to date. It even tells you how fresh the
-  rates are. Add your own currencies too.
+• Currency Converter: convert 30+ currencies completely offline and compare
+  several at once. Rates are built in, refresh automatically whenever you're
+  online, and always show you how fresh they are. You can even add your own
+  currencies.
 
-• Unit Converter: Length, weight, temperature and volume. Miles to kilometers,
-  pounds to kilograms, Fahrenheit to Celsius, and more.
+• Unit Converter: length, weight, temperature and volume. Miles to kilometers,
+  pounds to kilograms, Fahrenheit to Celsius in one tap.
 
-• Tip & Split: Work out the tip and split the bill between any number of people
-  in seconds. Round up per person with one tap.
+• Flashlight & SOS: a bright light, an SOS signal and a strobe, one tap away.
+  Made for camping trips, power cuts and real emergencies.
 
-• World Clock: See the time across the cities that matter to you, all at once.
-  Perfect for staying in sync with home while you travel.
+• Tip & Split: work out the tip and split the bill between any number of
+  people in seconds, with one-tap round up per person.
 
-• Phrasebook: Essential travel phrases in Spanish, French, German, Italian,
-  Portuguese and Japanese, with pronunciation. Tap to copy.
+• World Clock: every time zone that matters to you on one screen. Perfect for
+  staying in sync with home while you travel.
 
-• Sun Times: Offline sunrise and sunset times for wherever you are, calculated
-  on-device. Great for planning hikes and golden-hour photos.
+• Phrasebook: essential phrases in Spanish, French, German, Italian,
+  Portuguese and Japanese, with pronunciation guides. Tap any phrase to copy it.
 
-• Survival Guide: Quick offline reference for emergencies on the road.
+• Sun Times: sunrise, sunset, dawn and dusk for wherever you are, calculated
+  on your device. Perfect for planning hikes and golden hour photos.
 
-• Flashlight & SOS: Turn your phone into a light, an emergency SOS signal, or a
-  strobe. Great for camping and emergencies.
+• Survival Guide: first aid and outdoor emergency know-how, searchable and
+  ready with zero signal.
 
-★ ROAMKIT PRO (optional one-time purchase)
+★ ROAMKIT PRO: ONE PURCHASE, YOURS FOREVER
 
-Unlock the Pro tools with a single purchase, no subscription:
+No subscription. Unlock once and keep everything:
 
-• Trip Budget & Expenses: Track spending abroad, log expenses in any currency,
-  and see your daily and trip totals converted to your home currency.
+• Trip Budget: track spending abroad in any currency and see daily and trip
+  totals converted to your home currency automatically.
 
-• Spoken Phrasebook: Hear travel phrases spoken aloud.
+• Spoken Phrasebook: hear every phrase spoken out loud.
 
-• Compass: A simple offline compass for finding your way.
+• Compass: find your bearing anywhere, no signal needed.
 
-★ WHY ROAMKIT
+★ WHY TRAVELERS PICK ROAMKIT
 
-• Works 100% offline, no connection needed
-• No account, no sign-up
+• 100% offline: every tool works with no connection
+• No account and no sign-up
 • No ads, no tracking, no analytics
-• Clean, simple, fast
-• Your settings stay on your device
+• Fast, clean and easy to read
+• Everything stays on your device
 
-★ ALWAYS GROWING
+★ BUILT WITH YOU
 
-RoamKit is a toolkit that keeps expanding. Got an idea for a tool you'd love to
-have? Tap "Request a tool" right inside the app and tell us. New tools are
-added over time.
+RoamKit keeps growing. Want a tool that isn't in the kit yet? Tap "Request a
+tool" inside the app and tell us. The best ideas become new tools.
 
 Pack light. Roam far. Stay offline.
 ```
