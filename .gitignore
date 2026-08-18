@@ -53,3 +53,6 @@ build/
 
 # Google Cloud service account keys (secrets — never commit)
 roamkit-502021-*.json
+
+# Working notes and release log: local only, not part of the published repo
+PROGRESS.md
